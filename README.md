@@ -82,7 +82,7 @@ Daemonize does not need to be associated to a project. Prefer install as a globa
 
 ```bash
 composer global require "byjg/php-daemonize=~1.0"
-export PATH=/root/.composer/vendor/bin    # put this in the .bashrc or /etc/environment
+export PATH=/root/.composer/vendor/bin:$PATH    # put this in the .bashrc or /etc/environment
 ```
 
 
