@@ -9,7 +9,7 @@ namespace ByJG\Daemon\Sample;
  */
 class TryMe
 {
-    public function someMethod()
+    public function process()
     {
         file_put_contents('/tmp/tryme.txt', date('c') . "\n", FILE_APPEND);
     }
