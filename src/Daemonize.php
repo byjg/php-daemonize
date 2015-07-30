@@ -11,8 +11,18 @@ class Daemonize
             throw new \Exception("Template '$template' not found");
         }
 
+        $autoload = realpath(__DIR__ . "/../vendor/autoload.php");
+        if (!file_exists($autoload))
+        {
+            $autoload = realpath(__DIR__ . "/../../../autoload.php");
+            if (!file_exists($autoload))
+            {
+                throw new \Exception('Autoload not found. Did you run `composer dump-autload`?');
+            }
+        }
+
         $templateStr = str_replace('#DESCRIPTION#', $description,
-            str_replace('#DAEMONBOOTSTRAP#', realpath(__DIR__ . "/../vendor/autoload.php"),
+            str_replace('#DAEMONBOOTSTRAP#', $autoload,
                 str_replace('#CLASS#', str_replace("\\", "\\\\", $className),
                     str_replace('#BOOTSTRAP#', realpath($bootstrap),
                         str_replace('#SVCNAME#', $svcName,
