@@ -1,4 +1,7 @@
 # PHP Daemonize
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/37e7a7a0-402a-4add-a3bd-91b0c5cdc0ce/mini.png)](https://insight.sensiolabs.com/projects/37e7a7a0-402a-4add-a3bd-91b0c5cdc0ce)
+[![Code Climate](https://codeclimate.com/github/byjg/php-daemonize/badges/gpa.svg)](https://codeclimate.com/github/byjg/php-daemonize)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/byjg/php-daemonize/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/byjg/php-daemonize/?branch=master)
 
 ## Description
 
@@ -16,7 +19,7 @@ job/daemon.
 
 ## How to
 
-Suppose you have a pre-existing class for read some info from database and if exists you run some action. For example:
+Suppose you have a pre-existing class for read some info from database and run some action with these data. For example:
 
 ```php
 namespace Some\Name\Space;
