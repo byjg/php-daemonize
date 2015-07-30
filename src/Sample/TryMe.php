@@ -11,7 +11,6 @@ class TryMe
 {
     public function process()
     {
-        file_put_contents('/tmp/tryme.txt', date('c') . "\n", FILE_APPEND);
+        file_put_contents(sys_get_temp_dir() . '/tryme.txt', date('c') . "\n", FILE_APPEND);
     }
-
 }

@@ -2,6 +2,8 @@
 
 namespace ByJG\Daemon;
 
+use Exception;
+
 class Runner
 {
 
