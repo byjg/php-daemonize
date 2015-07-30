@@ -16,8 +16,7 @@
         "scripts/daemonize"
     ],
     "require": {
-		"php": ">=5.4.0",
-		"ext-curl": "*"
+		"php": ">=5.4.0"
 	},
     "license": "MIT"
 }
