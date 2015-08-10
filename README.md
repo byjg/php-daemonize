@@ -43,19 +43,19 @@ This file will tell to the script all setup you need to run this class.
 The most simple bootstrap.php is:
 
 ```php
-require_once __DIR__ . "vendor/autoload.php";
+require_once __DIR__ . "/vendor/autoload.php";
 ```
 
 Now, if you want to test it you can run the command:
 
 ```bash
-daemonize run \\Some\\Name\\Space\\MyExistingClass::someExistingMethod /path/to/bootstrap.php
+daemonize run "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relative/path/to/bootstrap.php" "/path/to/root"
 ```
 
-If everything is ok, now you can "daemonize" this class:
+If everything is ok, now you can "daemonize" this class (as root):
 
 ```php
-daemonize install mydaemon \\Some\\Name\\Space\\MyExistingClass::someExistingMethod /path/to/bootstrap.php
+daemonize install mydaemon "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relative/path/to/bootstrap.php" "/path/to/root"
 ```
 
 Now for start or stop the service you need only
@@ -78,12 +78,15 @@ daemonize list
 
 ## Install
 
-Daemonize does not need to be associated to a project. Prefer install as a global package and as root user.
+Daemonize does not need to be associated to your PHP project. Prefer install as a global package and as root user.
 
 ```bash
 composer global require "byjg/php-daemonize=~1.0"
 export PATH=/root/.composer/vendor/bin:$PATH    # put this in the .bashrc or /etc/environment
 ```
+
+If you want to share this composer install consider use the command `chmod a+x /root`. The root
+directory will remain unreadable, but you'll can execute the script "daemonize".
 
 
 ## Running a pre-installed demo
@@ -100,7 +103,7 @@ tail -f /etc/tryme.txt
 On the second do:
 
 ```php
-sudo daemonize install tryme \\ByJG\\Daemon\\Sample\\TryMe::process /root/.composer/vendor/byjg/php-daemonize/src/Sample/bootstrap.php
+sudo daemonize install tryme "\\ByJG\\Daemon\\Sample\\TryMe::process" "vendor/autoload.php" "."
 
 sudo service tryme start
 ```

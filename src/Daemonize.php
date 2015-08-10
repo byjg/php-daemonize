@@ -4,11 +4,17 @@ namespace ByJG\Daemon;
 
 class Daemonize
 {
-    public static function install($svcName, $className, $bootstrap, $template, $description)
+    public static function install($svcName, $className, $bootstrap, $curdir, $template, $description)
     {
         if (!file_exists($template))
         {
             throw new \Exception("Template '$template' not found");
+        }
+
+        $bootstrap = $curdir . '/' . $bootstrap;
+        if (!file_exists($bootstrap))
+        {
+            throw new \Exception("Bootstrap '$bootstrap' not found");
         }
 
         $autoload = realpath(__DIR__ . "/../vendor/autoload.php");
@@ -17,7 +23,7 @@ class Daemonize
             $autoload = realpath(__DIR__ . "/../../../autoload.php");
             if (!file_exists($autoload))
             {
-                throw new \Exception('Autoload not found. Did you run `composer dump-autload`?');
+                throw new \Exception('Daemonize autoload not found. Did you run `composer dump-autload`?');
             }
         }
 
@@ -26,7 +32,9 @@ class Daemonize
                 str_replace('#CLASS#', str_replace("\\", "\\\\", $className),
                     str_replace('#BOOTSTRAP#', realpath($bootstrap),
                         str_replace('#SVCNAME#', $svcName,
-                            file_get_contents($template)
+                            str_replace('#ROOTPATH#', realpath($curdir),
+                                file_get_contents($template)
+                            )
                         )
                     )
                 )

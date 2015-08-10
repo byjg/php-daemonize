@@ -32,10 +32,11 @@ try
             }
             $serviceName = $argv[2];
             $className = $argv[3];
-            $bootstrap = isset($argv[4]) ? $argv[4] : "";
-            $description = isset($argv[5]) ? $argv[5] : "Daemon for PHP Class $className";
+            $bootstrap = isset($argv[4]) ? $argv[4] : "vendor/autoload.php";
+            $curdir = isset($argv[5]) ? $argv[5] : getcwd();
+            $description = isset($argv[6]) ? $argv[6] : "Daemon for PHP Class $className";
             $template = __DIR__ . "/../template/linux-initd-service.conf";
-            ByJG\Daemon\Daemonize::install($serviceName, $className, $bootstrap, $template, $description);
+            ByJG\Daemon\Daemonize::install($serviceName, $className, $bootstrap, $curdir, $template, $description);
             break;
 
         case "uninstall":
@@ -64,8 +65,10 @@ try
         case "run":
             $className = $argv[2];
             $bootstrap = $argv[3];
+            $rootPath = $argv[4];
+            chdir($rootPath);
             require_once $bootstrap;
-            $runner = new \ByJG\Daemon\Runner($className, array_slice($argv, 4), false);
+            $runner = new \ByJG\Daemon\Runner($className, array_slice($argv, 5), false);
             $runner->execute();
             break;
 
@@ -84,16 +87,18 @@ echo "\nDone.\n\n";
 function showUsage()
 {
     echo "\nUsage:\n";
-    echo "    daemonize install service_name classname bootstrap 'description'\n";
-    echo "    daemonize run classname bootstrap\n";
+    echo "    daemonize install service_name classname bootstrap rootpath 'description'\n";
+    echo "    daemonize run classname bootstrap rootpath\n";
     echo "    daemonize list\n";
     echo "    daemonize uninstall service_name \n";
     echo "\n";
     echo "Where:\n";
-    echo "    service_name is the unix service name\n";
-    echo "    service_name is the PHP class and method like ClassName::Method\n";
-    echo "    bootstrap is the full path to a PHP file that load all requirements (like vendor/autoload.php) \n";
-    echo "    descriptions is an optional service description \n";
+    echo "   - service_name is the unix service name\n";
+    echo "   - classname is the PHP class and method like ClassName::Method\n";
+    echo "   - bootstrap is the relative path from root directory to a PHP file that \n"
+       . "     load all requirements (like vendor/autoload.php) \n";
+    echo "   - rootpath is the root path where your application is installed \n";
+    echo "   - description is an optional service description \n";
     echo "\n";
     die();
 }

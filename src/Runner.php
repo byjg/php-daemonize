@@ -53,7 +53,7 @@ class Runner
         $this->stdErr = fopen(self::BASE_LOG_PATH . '/' . $logname . '.error.log', 'ab');
     }
 
-    public function __construct($object, $consoleArgs, $daemon = true)
+    public function __construct($object, $consoleArgs = [], $daemon = true)
     {
         $this->daemon = $daemon;
 
