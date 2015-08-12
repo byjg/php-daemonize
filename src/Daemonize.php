@@ -4,7 +4,7 @@ namespace ByJG\Daemon;
 
 class Daemonize
 {
-    public static function install($svcName, $className, $bootstrap, $curdir, $template, $description)
+    public static function install($svcName, $className, $bootstrap, $curdir, $template, $description, $consoleArgs)
     {
         if (!file_exists($template))
         {
@@ -27,13 +27,21 @@ class Daemonize
             }
         }
 
+        if (!empty($consoleArgs)) {
+            $consoleArgsPrepared = '[ "' . implode('", "', $consoleArgs) . '" ]';
+        } else {
+            $consoleArgsPrepared = "[ ]";
+        }
+
         $templateStr = str_replace('#DESCRIPTION#', $description,
             str_replace('#DAEMONBOOTSTRAP#', $autoload,
                 str_replace('#CLASS#', str_replace("\\", "\\\\", $className),
                     str_replace('#BOOTSTRAP#', realpath($bootstrap),
                         str_replace('#SVCNAME#', $svcName,
                             str_replace('#ROOTPATH#', realpath($curdir),
-                                file_get_contents($template)
+                                str_replace('#CONSOLEARGS#', $consoleArgsPrepared,
+                                    file_get_contents($template)
+                                )
                             )
                         )
                     )

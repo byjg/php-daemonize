@@ -34,9 +34,9 @@ try
             $className = $argv[3];
             $bootstrap = isset($argv[4]) ? $argv[4] : "vendor/autoload.php";
             $curdir = isset($argv[5]) ? $argv[5] : getcwd();
-            $description = isset($argv[6]) ? $argv[6] : "Daemon for PHP Class $className";
+            $description = !empty($argv[6]) ? $argv[6] : "Daemon for PHP Class $className";
             $template = __DIR__ . "/../template/linux-initd-service.conf";
-            ByJG\Daemon\Daemonize::install($serviceName, $className, $bootstrap, $curdir, $template, $description);
+            ByJG\Daemon\Daemonize::install($serviceName, $className, $bootstrap, $curdir, $template, $description, array_slice($argv, 7));
             break;
 
         case "uninstall":
@@ -87,7 +87,7 @@ echo "\nDone.\n\n";
 function showUsage()
 {
     echo "\nUsage:\n";
-    echo "    daemonize install service_name classname bootstrap rootpath 'description'\n";
+    echo "    daemonize install service_name classname bootstrap rootpath 'description' args\n";
     echo "    daemonize run classname bootstrap rootpath\n";
     echo "    daemonize list\n";
     echo "    daemonize uninstall service_name \n";
@@ -99,6 +99,7 @@ function showUsage()
        . "     load all requirements (like vendor/autoload.php) \n";
     echo "   - rootpath is the root path where your application is installed \n";
     echo "   - description is an optional service description \n";
+    echo "   - args are a bunch of pair arguments like key1=value1 key2=value2";
     echo "\n";
     die();
 }
