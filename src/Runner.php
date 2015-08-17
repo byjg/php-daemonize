@@ -37,13 +37,15 @@ class Runner
         $_SERVER['REQUEST_URI'] = 'daemon.php';
     }
 
-    protected function prepareLogs()
+    protected function prepareLogs($logname = null)
     {
         if (!file_exists(self::BASE_LOG_PATH)) {
             mkdir(self::BASE_LOG_PATH);
         }
 
-        $logname = str_replace("\\", "_", strtolower($this->className)) . "." . strtolower($this->methodName);
+        if (empty($logname)) {
+            $logname = str_replace("\\", "_", strtolower($this->className)) . "." . strtolower($this->methodName);
+        }
 
         fclose(STDIN);
         fclose(STDOUT);
@@ -53,7 +55,7 @@ class Runner
         $this->stdErr = fopen(self::BASE_LOG_PATH . '/' . $logname . '.error.log', 'ab');
     }
 
-    public function __construct($object, $consoleArgs = [], $daemon = true)
+    public function __construct($object, $svcName, $consoleArgs = [], $daemon = true)
     {
         $this->daemon = $daemon;
 
@@ -63,7 +65,7 @@ class Runner
 
         // Prepare environment
         if ($this->daemon) {
-            $this->prepareLogs();
+            $this->prepareLogs($svcName);
         }
         $this->extractQueryParameters($consoleArgs);
 
@@ -93,16 +95,12 @@ class Runner
         // Execute routine
         while ($continue)
         {
-            try
-            {
+            try {
                 $output = $instance->$method();
-                if (!empty($output))
-                {
+                if (!empty($output)) {
                     $this->writeToStdout($output);
                 }
-            }
-            catch (Exception $ex)
-            {
+            } catch (Exception $ex) {
                 $this->writeToStderr(date('c') . ' [' . get_class($ex) . '] in ' . $ex->getFile() . ' at line ' . $ex->getLine() . ' -- ' . "\n");
                 $this->writeToStderr('Message: '. $ex->getMessage() . "\n");
                 $this->writeToStderr("Stack Trace:\n" . $ex->getTraceAsString());

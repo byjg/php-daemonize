@@ -9,7 +9,7 @@ if (!file_exists($autoload)) {
 }
 require_once($autoload);
 
-echo "\nPHP Daemonize class @ 2015 v1.0.1\n";
+echo "\nPHP Daemonize class @ 2015 v1.1.0\n";
 
 if ($argc < 2) {
     showUsage();
