@@ -70,7 +70,7 @@ try {
             }
 
             require_once $realPathBootstrap;
-            $runner = new \ByJG\Daemon\Runner($className, array_slice($argv, 5), false);
+            $runner = new \ByJG\Daemon\Runner($className, null, array_slice($argv, 5), false);
             $runner->execute();
             break;
 

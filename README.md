@@ -81,12 +81,12 @@ daemonize list
 Daemonize does not need to be associated to your PHP project. Prefer install as a global package and as root user.
 
 ```bash
-composer global require "byjg/php-daemonize=~1.0"
+composer global require "byjg/php-daemonize=~1.1"
 export PATH=/root/.composer/vendor/bin:$PATH    # put this in the .bashrc or /etc/environment
 ```
 
-If you want to share this composer install consider use the command `chmod a+x /root`. The root
-directory will remain unreadable, but you'll can execute the script "daemonize".
+If you want to share this installation with another users consider use the command `chmod a+x /root`. The root
+directory will remain unreadable for them, but you'll can execute the script "daemonize".
 
 
 ## Running a pre-installed demo
