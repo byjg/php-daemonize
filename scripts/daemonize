@@ -9,7 +9,7 @@ if (!file_exists($autoload)) {
 }
 require_once($autoload);
 
-echo "\nPHP Daemonize class @ 2015 v1.1.0\n";
+echo "\nPHP Daemonize class @ 2015 v1.1.1\n";
 
 if ($argc < 2) {
     showUsage();
@@ -99,7 +99,7 @@ function showUsage()
         ."     load all requirements (like vendor/autoload.php) \n";
     echo "   - rootpath is the root path where your application is installed \n";
     echo "   - description is an optional service description \n";
-    echo "   - args are a bunch of pair arguments like key1=value1 key2=value2";
+    echo "   - args are a bunch of pair arguments like 'key1=value1' 'key2=value2' (use quotes)";
     echo "\n";
     die();
 }
