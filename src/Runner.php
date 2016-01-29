@@ -29,7 +29,7 @@ class Runner
             $arPair = explode("=", $pair);
             if (sizeof($arPair) > 1)
             {
-                $_REQUEST[$arPair[0]] = $_GET[$arPair[0]] = implode('=', (array)$arPair[1]);
+                $_REQUEST[$arPair[0]] = $_GET[$arPair[0]] = implode('=', array_slice($arPair, 1));
             }
         }
         $_SERVER['QUERY_STRING'] = implode('&', $consoleArgs);
