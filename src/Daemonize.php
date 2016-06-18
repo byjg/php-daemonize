@@ -6,23 +6,19 @@ class Daemonize
 {
     public static function install($svcName, $className, $bootstrap, $curdir, $template, $description, $consoleArgs)
     {
-        if (!file_exists($template))
-        {
+        if (!file_exists($template)) {
             throw new \Exception("Template '$template' not found");
         }
 
         $bootstrap = $curdir . '/' . $bootstrap;
-        if (!file_exists($bootstrap))
-        {
+        if (!file_exists($bootstrap)) {
             throw new \Exception("Bootstrap '$bootstrap' not found");
         }
 
         $autoload = realpath(__DIR__ . "/../vendor/autoload.php");
-        if (!file_exists($autoload))
-        {
+        if (!file_exists($autoload)) {
             $autoload = realpath(__DIR__ . "/../../../autoload.php");
-            if (!file_exists($autoload))
-            {
+            if (!file_exists($autoload)) {
                 throw new \Exception('Daemonize autoload not found. Did you run `composer dump-autload`?');
             }
         }
@@ -49,9 +45,9 @@ class Daemonize
             )
         );
 
-		set_error_handler(function($number, $error){
-			throw new \Exception($error);
-		});
+        set_error_handler(function ($number, $error) {
+            throw new \Exception($error);
+        });
         file_put_contents("/etc/init.d/$svcName", $templateStr);
         shell_exec("chmod a+x /etc/init.d/$svcName");
         restore_error_handler();
@@ -61,15 +57,13 @@ class Daemonize
 
     public static function uninstall($svcName)
     {
-        $filename ="/etc/init.d/$svcName";
+        $filename = "/etc/init.d/$svcName";
 
-        if (!file_exists($filename))
-        {
+        if (!file_exists($filename)) {
             throw new \Exception("Service '$svcName' does not exists");
         }
 
-        if (!self::isDaemonizeService($filename))
-        {
+        if (!self::isDaemonizeService($filename)) {
             throw new \Exception("Service '$svcName' was not created by PHP Daemonize");
         }
 
@@ -80,9 +74,9 @@ class Daemonize
 
     protected static function isDaemonizeService($filename)
     {
-		set_error_handler(function($number, $error){
-			throw new \Exception($error);
-		});
+        set_error_handler(function ($number, $error) {
+            throw new \Exception($error);
+        });
 
         $contents = file_get_contents($filename);
 
@@ -94,10 +88,8 @@ class Daemonize
         $list = glob("/etc/init.d/*");
         $return = [];
 
-        foreach ($list as $filename)
-        {
-            if (self::isDaemonizeService($filename))
-            {
+        foreach ($list as $filename) {
+            if (self::isDaemonizeService($filename)) {
                 $return[] = basename($filename);
             }
         }

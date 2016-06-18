@@ -19,8 +19,7 @@ class UninstallCommand extends Command
                 'servicename',
                 InputArgument::REQUIRED,
                 'The unix service name.'
-            )
-        ;
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

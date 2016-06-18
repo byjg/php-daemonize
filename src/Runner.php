@@ -21,19 +21,22 @@ class Runner
 
     protected $daemon = true;
 
-    protected function extractQueryParameters($consoleArgs)
+    public function __construct($object, $svcName, $consoleArgs = [], $daemon = true)
     {
-        // Read parameters and convert to PHP $_GET variables
-        foreach ($consoleArgs as $pair)
-        {
-            $arPair = explode("=", $pair);
-            if (sizeof($arPair) > 1)
-            {
-                $_REQUEST[$arPair[0]] = $_GET[$arPair[0]] = implode('=', array_slice($arPair, 1));
-            }
+        $this->daemon = $daemon;
+
+        $arr = explode("::", $object);
+        $className = $this->className = $arr[0];
+        $this->methodName = $arr[1];
+
+        // Prepare environment
+        if ($this->daemon) {
+            $this->prepareLogs($svcName);
         }
-        $_SERVER['QUERY_STRING'] = implode('&', $consoleArgs);
-        $_SERVER['REQUEST_URI'] = 'daemon.php';
+        $this->extractQueryParameters($consoleArgs);
+
+        // Instantiate the class
+        $this->instance = new $className();
     }
 
     protected function prepareLogs($logname = null)
@@ -54,32 +57,17 @@ class Runner
         $this->stdErr = fopen(self::BASE_LOG_PATH . '/' . $logname . '.error.log', 'ab');
     }
 
-    public function __construct($object, $svcName, $consoleArgs = [], $daemon = true)
+    protected function extractQueryParameters($consoleArgs)
     {
-        $this->daemon = $daemon;
-
-        $arr = explode("::", $object);
-        $className = $this->className = $arr[0];
-        $this->methodName = $arr[1];
-
-        // Prepare environment
-        if ($this->daemon) {
-            $this->prepareLogs($svcName);
+        // Read parameters and convert to PHP $_GET variables
+        foreach ($consoleArgs as $pair) {
+            $arPair = explode("=", $pair);
+            if (sizeof($arPair) > 1) {
+                $_REQUEST[$arPair[0]] = $_GET[$arPair[0]] = implode('=', array_slice($arPair, 1));
+            }
         }
-        $this->extractQueryParameters($consoleArgs);
-
-        // Instantiate the class
-        $this->instance = new $className();
-    }
-
-    public function writeToStderr($msg)
-    {
-        fwrite($this->stdErr, $msg);
-    }
-
-    public function writeToStdout($msg)
-    {
-        fwrite($this->stdOut, $msg);
+        $_SERVER['QUERY_STRING'] = implode('&', $consoleArgs);
+        $_SERVER['REQUEST_URI'] = 'daemon.php';
     }
 
     public function execute()
@@ -92,8 +80,7 @@ class Runner
         $continue = true;
 
         // Execute routine
-        while ($continue)
-        {
+        while ($continue) {
             try {
                 $output = $instance->$method();
                 if (!empty($output)) {
@@ -101,7 +88,7 @@ class Runner
                 }
             } catch (Exception $ex) {
                 $this->writeToStderr(date('c') . ' [' . get_class($ex) . '] in ' . $ex->getFile() . ' at line ' . $ex->getLine() . ' -- ' . "\n");
-                $this->writeToStderr('Message: '. $ex->getMessage() . "\n");
+                $this->writeToStderr('Message: ' . $ex->getMessage() . "\n");
                 $this->writeToStderr("Stack Trace:\n" . $ex->getTraceAsString());
                 $this->writeToStderr("\n\n");
             }
@@ -113,5 +100,15 @@ class Runner
             }
         }
         //while (true)
+    }
+
+    public function writeToStdout($msg)
+    {
+        fwrite($this->stdOut, $msg);
+    }
+
+    public function writeToStderr($msg)
+    {
+        fwrite($this->stdErr, $msg);
     }
 }

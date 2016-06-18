@@ -36,8 +36,7 @@ class RunCommand extends Command
                 'args',
                 InputArgument::IS_ARRAY,
                 'is an optional arguments for your class'
-            )
-        ;
+            );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)

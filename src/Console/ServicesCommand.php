@@ -13,8 +13,7 @@ class ServicesCommand extends Command
     {
         $this
             ->setName('services')
-            ->setDescription('List all services installed by daemonize')
-        ;
+            ->setDescription('List all services installed by daemonize');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -27,7 +26,7 @@ class ServicesCommand extends Command
         } else {
             $output->writeln("List of daemonize services: ");
             foreach ($list as $filename) {
-                $output->writeln(" - ".basename($filename));
+                $output->writeln(" - " . basename($filename));
             }
         }
         $output->writeln("");
