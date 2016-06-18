@@ -73,7 +73,7 @@ daemonize uninstall mydamon
 and list all "daemonized" php classes
 
 ```php
-daemonize list
+daemonize services
 ```
 
 ## Install
@@ -81,7 +81,7 @@ daemonize list
 Daemonize does not need to be associated to your PHP project. Prefer install as a global package and as root user.
 
 ```bash
-composer global require "byjg/php-daemonize=~1.1"
+composer global require "byjg/php-daemonize=1.2.*"
 export PATH=/root/.composer/vendor/bin:$PATH    # put this in the .bashrc or /etc/environment
 ```
 

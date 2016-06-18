@@ -9,97 +9,11 @@ if (!file_exists($autoload)) {
 }
 require_once($autoload);
 
-echo "\nPHP Daemonize class @ 2015 v1.1.2\n";
+use Symfony\Component\Console\Application;
 
-if ($argc < 2) {
-    showUsage();
-}
-
-$action = $argv[1];
-
-try {
-    switch ($action) {
-        case "install":
-            if ($argc < 5) {
-                throw new Exception('All parameters are required');
-            }
-            $serviceName = $argv[2];
-            $className = $argv[3];
-            $bootstrap = isset($argv[4]) ? $argv[4] : "vendor/autoload.php";
-            $curdir = isset($argv[5]) ? $argv[5] : getcwd();
-            $description = !empty($argv[6]) ? $argv[6] : "Daemon for PHP Class $className";
-            $template = __DIR__."/../template/linux-initd-service.conf";
-            ByJG\Daemon\Daemonize::install($serviceName, $className, $bootstrap, $curdir, $template, $description,
-                array_slice($argv, 7));
-            break;
-
-        case "uninstall":
-            $serviceName = $argv[2];
-            shell_exec("service $serviceName stop");
-            ByJG\Daemon\Daemonize::uninstall($serviceName);
-            break;
-
-        case "list":
-            $list = ByJG\Daemon\Daemonize::listServices();
-
-            if (count($list) == 0) {
-                echo "\nThere is no daemonize services installed.\n";
-            } else {
-                echo "\nList of daemonize services: \n";
-                foreach ($list as $filename) {
-                    echo " - ".basename($filename)."\n";
-                }
-            }
-            break;
-
-        case "run":
-            $className = $argv[2];
-            $bootstrap = $argv[3];
-            $rootPath = $argv[4];
-
-            $realPathBootstrap = realpath($rootPath . $bootstrap);
-            $realPathRootPath = realpath($rootPath);
-
-            if (!file_exists($realPathRootPath)) {
-                throw new \Exception("The rootpath '$rootPath' does not exists");
-            }
-            chdir($realPathRootPath);
-
-            if (!file_exists($realPathBootstrap)) {
-                throw new \Exception("The bootstrap file '$bootstrap' does not exists");
-            }
-
-            require_once $realPathBootstrap;
-            $runner = new \ByJG\Daemon\Runner($className, null, array_slice($argv, 5), false);
-            $runner->execute();
-            break;
-
-        default:
-            throw new \Exception("Invalid action");
-    }
-} catch (Exception $ex) {
-    echo "\nError: ".$ex->getMessage()."\n";
-    showUsage();
-}
-
-echo "\nDone.\n\n";
-
-function showUsage()
-{
-    echo "\nUsage:\n";
-    echo "    daemonize install service_name classname bootstrap rootpath 'description' args\n";
-    echo "    daemonize run classname bootstrap rootpath\n";
-    echo "    daemonize list\n";
-    echo "    daemonize uninstall service_name \n";
-    echo "\n";
-    echo "Where:\n";
-    echo "   - service_name is the unix service name\n";
-    echo "   - classname is the PHP class and method like ClassName::Method\n";
-    echo "   - bootstrap is the relative path from root directory to a PHP file that \n"
-        ."     load all requirements (like vendor/autoload.php) \n";
-    echo "   - rootpath is the root path where your application is installed \n";
-    echo "   - description is an optional service description \n";
-    echo "   - args are a bunch of pair arguments like 'key1=value1' 'key2=value2' (use quotes)";
-    echo "\n";
-    die();
-}
+$application = new Application('PHP Daemonize by JG', '1.2.0');
+$application->add(new \ByJG\Daemon\Console\InstallCommand());
+$application->add(new \ByJG\Daemon\Console\UninstallCommand());
+$application->add(new \ByJG\Daemon\Console\RunCommand());
+$application->add(new \ByJG\Daemon\Console\ServicesCommand());
+$application->run();

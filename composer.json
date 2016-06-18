@@ -1,22 +1,23 @@
 {
-    "name": "byjg/php-daemonize",
-    "description": "Transform any class in a *nix daemon process or cron job without changes or refactoring.",
-    "authors": [
-        {
-            "name": "João Gilberto Magalhães",
-            "email": "joao@byjg.com.br"
-        }
-    ],
-    "autoload": {
-        "psr-4": {
-            "ByJG\\Daemon\\": "src/"
-        }
-    },
-    "bin": [
-        "scripts/daemonize"
-    ],
-    "require": {
-		"php": ">=5.4.0"
-	},
-    "license": "MIT"
+  "name": "byjg/php-daemonize",
+  "description": "Transform any class in a *nix daemon process or cron job without changes or refactoring.",
+  "authors": [
+    {
+      "name": "João Gilberto Magalhães",
+      "email": "joao@byjg.com.br"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "ByJG\\Daemon\\": "src/"
+    }
+  },
+  "bin": [
+    "scripts/daemonize"
+  ],
+  "require": {
+    "symfony/console": "3.1.*",
+    "php": ">=5.4.0"
+  },
+  "license": "MIT"
 }
