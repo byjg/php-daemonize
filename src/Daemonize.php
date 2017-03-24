@@ -4,7 +4,16 @@ namespace ByJG\Daemon;
 
 class Daemonize
 {
-    public static function install($svcName, $className, $bootstrap, $curdir, $template, $description, $consoleArgs)
+    public static function install(
+        $svcName,
+        $className,
+        $bootstrap,
+        $curdir,
+        $template,
+        $targetServicePath,
+        $description,
+        $consoleArgs
+    )
     {
         if (!file_exists($template)) {
             throw new \Exception("Template '$template' not found");
@@ -48,8 +57,8 @@ class Daemonize
         set_error_handler(function ($number, $error) {
             throw new \Exception($error);
         });
-        file_put_contents("/etc/init.d/$svcName", $templateStr);
-        shell_exec("chmod a+x /etc/init.d/$svcName");
+        file_put_contents($targetServicePath, $templateStr);
+        shell_exec("chmod a+x $targetServicePath");
         restore_error_handler();
 
         return true;
