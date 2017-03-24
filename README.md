@@ -55,8 +55,10 @@ daemonize run "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relati
 If everything is ok, now you can "daemonize" this class (as root):
 
 ```php
-daemonize install mydaemon "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relative/path/to/bootstrap.php" "/path/to/root"
+daemonize install --template=upstart mydaemon "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relative/path/to/bootstrap.php" "/path/to/root"
 ```
+
+*note*: valid templates are: upstart or initd (default)
 
 Now for start or stop the service you need only
 
@@ -73,7 +75,7 @@ daemonize uninstall mydamon
 and list all "daemonized" php classes
 
 ```php
-daemonize services
+daemonize services --only-names
 ```
 
 ## Install

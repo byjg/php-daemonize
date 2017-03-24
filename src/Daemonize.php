@@ -69,7 +69,10 @@ class Daemonize
         $filename = "/etc/init.d/$svcName";
 
         if (!file_exists($filename)) {
-            throw new \Exception("Service '$svcName' does not exists");
+            $filename = "/etc/init/$svcName.conf";
+            if (!file_exists($filename)) {
+                throw new \Exception("Service '$svcName' does not exists");
+            }
         }
 
         if (!self::isDaemonizeService($filename)) {
@@ -94,12 +97,14 @@ class Daemonize
 
     public static function listServices()
     {
-        $list = glob("/etc/init.d/*");
+        $list1 = glob("/etc/init.d/*");
+        $list2 = glob("/etc/init/*.conf");
+        $list = array_merge($list1, $list2);
         $return = [];
 
         foreach ($list as $filename) {
             if (self::isDaemonizeService($filename)) {
-                $return[] = basename($filename);
+                $return[] = str_replace('.conf', '', basename($filename));
             }
         }
 
