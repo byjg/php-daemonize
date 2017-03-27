@@ -33,10 +33,18 @@ class Runner
         if ($this->daemon) {
             $this->prepareLogs($svcName);
         }
-        $this->extractQueryParameters($consoleArgs);
 
-        // Instantiate the class
-        $this->instance = new $className();
+        try {
+            $this->extractQueryParameters($consoleArgs);
+
+            // Instantiate the class
+            $this->instance = new $className();
+        } catch (Exception $ex) {
+            $this->writeToStderr("System Fail to Start: \n");
+            $this->writeToStderr('Message: ' . $ex->getMessage() . "\n");
+            $this->writeToStderr("Stack Trace:\n" . $ex->getTraceAsString());
+            $this->writeToStderr("\n\n");
+        }
     }
 
     protected function prepareLogs($logname = null)

@@ -73,6 +73,18 @@ class Daemonize
 
         $serviceStr = Daemonize::replaceVars($vars, file_get_contents($serviceTemplatePath));
 
+        // Check if is OK
+        require_once ($vars['#BOOTSTRAP#']);
+        $classParts = explode('::', $vars['#CLASS#']);
+        if (!class_exists($classParts[0])) {
+            throw new \Exception('Could not find class ' . $classParts[0]);
+        }
+        $className = $classParts[0];
+        $classTest = new $className();
+        if (!method_exists($classTest, $classParts[1])) {
+            throw new \Exception('Could not find method ' . $vars['#CLASS#']);
+        }
+
         set_error_handler(function ($number, $error) {
             throw new \Exception($error);
         });
