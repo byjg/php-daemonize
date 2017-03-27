@@ -4,7 +4,7 @@ namespace ByJG\Daemon;
 
 class Daemonize
 {
-    public static function install(
+    public static function  install(
         $svcName,
         $className,
         $bootstrap,
@@ -75,7 +75,7 @@ class Daemonize
 
         // Check if is OK
         require_once ($vars['#BOOTSTRAP#']);
-        $classParts = explode('::', $vars['#CLASS#']);
+        $classParts = explode('::', str_replace("\\\\", "\\", $vars['#CLASS#']));
         if (!class_exists($classParts[0])) {
             throw new \Exception('Could not find class ' . $classParts[0]);
         }
