@@ -60,23 +60,12 @@ class InstallCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $template = __DIR__ . "/../../template/linux-" . $input->getOption('template') . "-service.conf";
-
-        if (!file_exists($template)) {
-            throw new \Exception('The valid templates are: "initd" or "upstart" ');
-        }
-
         Daemonize::install(
             $input->getArgument('servicename'),
             $input->getArgument('classname'),
             $input->getArgument('bootstrap'),
             $input->getArgument('rootdir'),
-            $template,
-            (
-                $input->getOption('template') == 'initd'
-                    ? "/etc/init.d/" . $input->getArgument('servicename')
-                    : "/etc/init/" . $input->getArgument('servicename') . ".conf"
-            ),
+            $input->getOption('template'),
             $input->getArgument('description'),
             $input->getArgument('args')
         );

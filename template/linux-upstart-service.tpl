@@ -13,10 +13,5 @@ respawn limit 99 5
 
 script
     echo -n $"Starting $NAME: "
-    CMD1='chdir("#ROOTPATH#");'
-    CMD2='require_once "#BOOTSTRAP#";'
-    CMD3='require_once "#DAEMONBOOTSTRAP#";'
-    CMD4='$runner = new \ByJG\Daemon\Runner("#CLASS#", "#SVCNAME#", #CONSOLEARGS#);'
-    CMD5='$runner->execute();'
-    `which php` -r "$CMD1 $CMD2 $CMD3 $CMD4 $CMD5"
+    #PHPPATH# #DAEMONIZESERVICE#
 end script
