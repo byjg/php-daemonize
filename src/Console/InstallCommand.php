@@ -23,6 +23,13 @@ class InstallCommand extends Command
                 'Defines the default service template -- initd or upstart',
                 'initd'
             )
+            ->addOption(
+                'no-check',
+                'nc',
+                InputOption::VALUE_NONE,
+                'No check for path or file errors. Just install. ',
+                true
+            )
             ->addArgument(
                 'servicename',
                 InputArgument::REQUIRED,
@@ -67,7 +74,8 @@ class InstallCommand extends Command
             $input->getArgument('rootdir'),
             $input->getOption('template'),
             $input->getArgument('description'),
-            $input->getArgument('args')
+            $input->getArgument('args'),
+            $input->getOption('no-check')
         );
     }
 }

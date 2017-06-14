@@ -11,7 +11,8 @@ class Daemonize
         $curdir,
         $template,
         $description,
-        $consoleArgs
+        $consoleArgs,
+        $check = true
     )
     {
         $targetPathAvailable = [
@@ -34,14 +35,14 @@ class Daemonize
         }
 
         $bootstrap = $curdir . '/' . $bootstrap;
-        if (!file_exists($bootstrap)) {
+        if (!file_exists($bootstrap) && $check) {
             throw new \Exception("Bootstrap '$bootstrap' not found");
         }
 
         $autoload = realpath(__DIR__ . "/../vendor/autoload.php");
         if (!file_exists($autoload)) {
             $autoload = realpath(__DIR__ . "/../../../autoload.php");
-            if (!file_exists($autoload)) {
+            if (!file_exists($autoload) && $check) {
                 throw new \Exception('Daemonize autoload not found. Did you run `composer dump-autload`?');
             }
         }
@@ -77,15 +78,17 @@ class Daemonize
         $serviceStr = Daemonize::replaceVars($vars, file_get_contents($serviceTemplatePath));
 
         // Check if is OK
-        require_once ($vars['#BOOTSTRAP#']);
-        $classParts = explode('::', str_replace("\\\\", "\\", $vars['#CLASS#']));
-        if (!class_exists($classParts[0])) {
-            throw new \Exception('Could not find class ' . $classParts[0]);
-        }
-        $className = $classParts[0];
-        $classTest = new $className();
-        if (!method_exists($classTest, $classParts[1])) {
-            throw new \Exception('Could not find method ' . $vars['#CLASS#']);
+        if ($check) {
+            require_once($vars['#BOOTSTRAP#']);
+            $classParts = explode('::', str_replace("\\\\", "\\", $vars['#CLASS#']));
+            if (!class_exists($classParts[0])) {
+                throw new \Exception('Could not find class ' . $classParts[0]);
+            }
+            $className = $classParts[0];
+            $classTest = new $className();
+            if (!method_exists($classTest, $classParts[1])) {
+                throw new \Exception('Could not find method ' . $vars['#CLASS#']);
+            }
         }
 
         set_error_handler(function ($number, $error) {
