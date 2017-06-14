@@ -27,8 +27,7 @@ class InstallCommand extends Command
                 'no-check',
                 'nc',
                 InputOption::VALUE_NONE,
-                'No check for path or file errors. Just install. ',
-                true
+                'No check for path or file errors. Just install. '
             )
             ->addArgument(
                 'servicename',
@@ -75,7 +74,7 @@ class InstallCommand extends Command
             $input->getOption('template'),
             $input->getArgument('description'),
             $input->getArgument('args'),
-            $input->getOption('no-check')
+            !$input->hasOption('no-check')
         );
     }
 }
