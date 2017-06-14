@@ -26,5 +26,6 @@ class UninstallCommand extends Command
     {
         $serviceName = $input->getArgument('servicename');
         Daemonize::uninstall($serviceName);
+        $output->writeln('Service uninstalled. Maybe the service still running. ');
     }
 }

@@ -47,6 +47,9 @@ class Daemonize
         }
 
         if (!empty($consoleArgs)) {
+            for ($i=0; $i<count($consoleArgs); $i++) {
+                $consoleArgs[$i] = str_replace('"', '\\"', $consoleArgs[$i]);
+            }
             $consoleArgsPrepared = '[ "' . implode('", "', $consoleArgs) . '" ]';
         } else {
             $consoleArgsPrepared = "[ ]";
@@ -119,7 +122,6 @@ class Daemonize
                 if (!self::isDaemonizeService($service)) {
                     throw new \Exception("Service '$svcName' was not created by PHP Daemonize");
                 }
-                shell_exec("service $svcName stop");
                 unlink($service);
             }
         }
