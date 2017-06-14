@@ -48,7 +48,7 @@ class Daemonize
 
         if (!empty($consoleArgs)) {
             for ($i=0; $i<count($consoleArgs); $i++) {
-                $consoleArgs[$i] = str_replace('"', '\"', $consoleArgs[$i]);
+                $consoleArgs[$i] = str_replace('"', '\\"', $consoleArgs[$i]);
             }
             $consoleArgsPrepared = '[ "' . implode('", "', $consoleArgs) . '" ]';
         } else {
