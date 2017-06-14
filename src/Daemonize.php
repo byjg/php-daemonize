@@ -64,7 +64,7 @@ class Daemonize
             '#DESCRIPTION#' => $description,
             '#DAEMONBOOTSTRAP#' => $autoload,
             '#CLASS#' => str_replace("\\", "\\\\", $className),
-            '#BOOTSTRAP#' => realpath($bootstrap),
+            '#BOOTSTRAP#' => $bootstrap,
             '#SVCNAME#' => $svcName,
             '#ROOTPATH#' => realpath($curdir),
             '#CONSOLEARGS#' => $consoleArgsPrepared,
