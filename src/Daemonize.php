@@ -4,10 +4,33 @@ namespace ByJG\Daemon;
 
 class Daemonize
 {
-    public static function install($svcName, $className, $bootstrap, $curdir, $template, $description, $consoleArgs)
+    public static function  install(
+        $svcName,
+        $className,
+        $bootstrap,
+        $curdir,
+        $template,
+        $description,
+        $consoleArgs
+    )
     {
-        if (!file_exists($template)) {
-            throw new \Exception("Template '$template' not found");
+        $targetPathAvailable = [
+            'initd' => "/etc/init.d/$svcName",
+            'upstart' => "/etc/init/$svcName.conf",
+            'systemd' => "/lib/systemd/system/$svcName.service"
+        ];
+        if (!isset($targetPathAvailable[$template])) {
+            throw new \Exception(
+                "Template $template does not exists. Available templates are: "
+                . implode(',', array_keys($targetPathAvailable))
+            );
+        }
+        $targetServicePath = $targetPathAvailable[$template];
+
+        $templatePath = __DIR__ . "/../template/linux-" . $template . "-service.tpl";
+
+        if (!file_exists($templatePath)) {
+            throw new \Exception("Template '$templatePath' not found");
         }
 
         $bootstrap = $curdir . '/' . $bootstrap;
@@ -29,45 +52,81 @@ class Daemonize
             $consoleArgsPrepared = "[ ]";
         }
 
-        $templateStr = str_replace('#DESCRIPTION#', $description,
-            str_replace('#DAEMONBOOTSTRAP#', $autoload,
-                str_replace('#CLASS#', str_replace("\\", "\\\\", $className),
-                    str_replace('#BOOTSTRAP#', realpath($bootstrap),
-                        str_replace('#SVCNAME#', $svcName,
-                            str_replace('#ROOTPATH#', realpath($curdir),
-                                str_replace('#CONSOLEARGS#', $consoleArgsPrepared,
-                                    file_get_contents($template)
-                                )
-                            )
-                        )
-                    )
-                )
-            )
-        );
+        $serviceTemplatePath = __DIR__ . "/../template/_service.php.tpl";
+        $daemonizeService = __DIR__ . "/../services/$svcName.php";
+        $phpPath = PHP_BINARY;
+
+        $vars = [
+            '#DESCRIPTION#' => $description,
+            '#DAEMONBOOTSTRAP#' => $autoload,
+            '#CLASS#' => str_replace("\\", "\\\\", $className),
+            '#BOOTSTRAP#' => realpath($bootstrap),
+            '#SVCNAME#' => $svcName,
+            '#ROOTPATH#' => realpath($curdir),
+            '#CONSOLEARGS#' => $consoleArgsPrepared,
+            '#PHPPATH#' => $phpPath,
+            '#SERVICETEMPLATEPATH#' => $serviceTemplatePath,
+            '#DAEMONIZESERVICE#' => $daemonizeService,
+        ];
+
+        $templateStr = Daemonize::replaceVars($vars, file_get_contents($templatePath));
+
+        $serviceStr = Daemonize::replaceVars($vars, file_get_contents($serviceTemplatePath));
+
+        // Check if is OK
+        require_once ($vars['#BOOTSTRAP#']);
+        $classParts = explode('::', str_replace("\\\\", "\\", $vars['#CLASS#']));
+        if (!class_exists($classParts[0])) {
+            throw new \Exception('Could not find class ' . $classParts[0]);
+        }
+        $className = $classParts[0];
+        $classTest = new $className();
+        if (!method_exists($classTest, $classParts[1])) {
+            throw new \Exception('Could not find method ' . $vars['#CLASS#']);
+        }
 
         set_error_handler(function ($number, $error) {
             throw new \Exception($error);
         });
-        file_put_contents("/etc/init.d/$svcName", $templateStr);
-        shell_exec("chmod a+x /etc/init.d/$svcName");
+        file_put_contents($targetServicePath, $templateStr);
+        shell_exec("chmod a+x $targetServicePath");
+        file_put_contents($daemonizeService, $serviceStr);
         restore_error_handler();
 
         return true;
     }
 
+    protected static function replaceVars($vars, $text)
+    {
+        foreach ($vars as $searchFor=>$replace) {
+            $text = str_replace($searchFor, $replace, $text);
+        }
+        return $text;
+    }
+
     public static function uninstall($svcName)
     {
-        $filename = "/etc/init.d/$svcName";
+        $list = [
+            "/etc/init.d/$svcName",
+            "/etc/init/$svcName.conf",
+            "/lib/systemd/system/$svcName.service"
+        ];
 
-        if (!file_exists($filename)) {
+        $found = false;
+        foreach ($list as $service) {
+            if (file_exists($service)) {
+                $found = true;
+                if (!self::isDaemonizeService($service)) {
+                    throw new \Exception("Service '$svcName' was not created by PHP Daemonize");
+                }
+                shell_exec("service $svcName stop");
+                unlink($service);
+            }
+        }
+
+        if (!$found) {
             throw new \Exception("Service '$svcName' does not exists");
         }
-
-        if (!self::isDaemonizeService($filename)) {
-            throw new \Exception("Service '$svcName' was not created by PHP Daemonize");
-        }
-
-        unlink($filename);
 
         restore_error_handler();
     }
@@ -85,12 +144,23 @@ class Daemonize
 
     public static function listServices()
     {
-        $list = glob("/etc/init.d/*");
+        $list1 = glob("/etc/init.d/*");
+        $list2 = glob("/etc/init/*.conf");
+        $list3 = glob("/lib/systemd/system/*.service");
+        $list = array_merge($list1, $list2, $list3);
         $return = [];
 
         foreach ($list as $filename) {
             if (self::isDaemonizeService($filename)) {
-                $return[] = basename($filename);
+                $return[] = str_replace(
+                    '.service',
+                    '',
+                    str_replace(
+                        '.conf',
+                        '',
+                        basename($filename)
+                    )
+                );
             }
         }
 

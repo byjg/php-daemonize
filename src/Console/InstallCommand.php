@@ -6,6 +6,7 @@ use ByJG\Daemon\Daemonize;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class InstallCommand extends Command
@@ -15,6 +16,13 @@ class InstallCommand extends Command
         $this
             ->setName('install')
             ->setDescription('Install a PHP Class as Linux Daemon')
+            ->addOption(
+                'template',
+                't',
+                InputOption::VALUE_REQUIRED,
+                'Defines the default service template -- initd or upstart',
+                'initd'
+            )
             ->addArgument(
                 'servicename',
                 InputArgument::REQUIRED,
@@ -35,7 +43,7 @@ class InstallCommand extends Command
                 'rootdir',
                 InputArgument::OPTIONAL,
                 'The root path where your application is installed',
-                getcwd()
+                getcwd() . "/"
             )
             ->addArgument(
                 'description',
@@ -57,7 +65,7 @@ class InstallCommand extends Command
             $input->getArgument('classname'),
             $input->getArgument('bootstrap'),
             $input->getArgument('rootdir'),
-            __DIR__ . "/../../template/linux-initd-service.conf",
+            $input->getOption('template'),
             $input->getArgument('description'),
             $input->getArgument('args')
         );

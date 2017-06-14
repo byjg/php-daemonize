@@ -21,12 +21,7 @@ PIDFILE=/var/run/$NAME.pid
 
 start() {
     echo -n $"Starting $NAME: "
-    CMD1='chdir("#ROOTPATH#");'
-    CMD2='require_once "#BOOTSTRAP#";'
-    CMD3='require_once "#DAEMONBOOTSTRAP#";'
-    CMD4='$runner = new \ByJG\Daemon\Runner("#CLASS#", "#SVCNAME#", #CONSOLEARGS#);'
-    CMD5='$runner->execute();'
-    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --exec `which php` -- -r "$CMD1 $CMD2 $CMD3 $CMD4 $CMD5"
+    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --exec #PHPPATH# #DAEMONIZESERVICE#"
     case "$?" in
         0) echo "OK!" ;;
         1) echo "already started" ;;
@@ -38,7 +33,7 @@ stop() {
     echo -n $"Stopping $NAME: "
     start-stop-daemon --stop --pidfile $PIDFILE
     case "$?" in
-        0) echo "OK!" ;;
+        0) echo "OK!" && rm -f $PIDFILE;;
         1) echo "already stopped" ;;
         *) echo "Fail!" ;;
     esac

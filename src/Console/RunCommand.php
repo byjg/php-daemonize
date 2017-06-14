@@ -30,7 +30,7 @@ class RunCommand extends Command
                 'rootdir',
                 InputArgument::OPTIONAL,
                 'The root path where your application is installed',
-                getcwd()
+                getcwd() . "/"
             )
             ->addArgument(
                 'args',

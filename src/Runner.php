@@ -33,10 +33,21 @@ class Runner
         if ($this->daemon) {
             $this->prepareLogs($svcName);
         }
-        $this->extractQueryParameters($consoleArgs);
 
-        // Instantiate the class
-        $this->instance = new $className();
+        try {
+            $this->extractQueryParameters($consoleArgs);
+
+            // Instantiate the class
+            if (!class_exists($className)) {
+                throw new \Exception("Could not found the class $className");
+            }
+            $this->instance = new $className();
+        } catch (Exception $ex) {
+            $this->writeToStderr("System Fail to Start: \n");
+            $this->writeToStderr('Message: ' . $ex->getMessage() . "\n");
+            $this->writeToStderr("Stack Trace:\n" . $ex->getTraceAsString());
+            $this->writeToStderr("\n\n");
+        }
     }
 
     protected function prepareLogs($logname = null)
@@ -49,12 +60,17 @@ class Runner
             $logname = str_replace("\\", "_", strtolower($this->className)) . "." . strtolower($this->methodName);
         }
 
-        fclose(STDIN);
-        fclose(STDOUT);
-        fclose(STDERR);
-        $this->stdIn = fopen('/dev/null', 'r');
-        $this->stdOut = fopen(self::BASE_LOG_PATH . '/' . $logname . '.log', 'ab');
-        $this->stdErr = fopen(self::BASE_LOG_PATH . '/' . $logname . '.error.log', 'ab');
+        if (
+            is_writable(self::BASE_LOG_PATH . '/' . $logname . '.log')
+            && is_writable(self::BASE_LOG_PATH . '/' . $logname . '.error.log')
+        ) {
+            fclose(STDIN);
+            fclose(STDOUT);
+            fclose(STDERR);
+            $this->stdIn = fopen('/dev/null', 'r');
+            $this->stdOut = fopen(self::BASE_LOG_PATH . '/' . $logname . '.log', 'ab');
+            $this->stdErr = fopen(self::BASE_LOG_PATH . '/' . $logname . '.error.log', 'ab');
+        }
     }
 
     protected function extractQueryParameters($consoleArgs)

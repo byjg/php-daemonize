@@ -2,3 +2,5 @@ nbproject/private
 *~
 composer.lock
 vendor
+.idea
+services/*.php

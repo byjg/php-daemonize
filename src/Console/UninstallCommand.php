@@ -25,7 +25,6 @@ class UninstallCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $serviceName = $input->getArgument('servicename');
-        shell_exec("service $serviceName stop");
         Daemonize::uninstall($serviceName);
     }
 }

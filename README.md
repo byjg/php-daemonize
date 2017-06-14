@@ -55,8 +55,10 @@ daemonize run "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relati
 If everything is ok, now you can "daemonize" this class (as root):
 
 ```php
-daemonize install mydaemon "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relative/path/to/bootstrap.php" "/path/to/root"
+daemonize install --template=upstart mydaemon "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relative/path/to/bootstrap.php" "/path/to/root"
 ```
+
+*note*: valid templates are: upstart or initd (default)
 
 Now for start or stop the service you need only
 
@@ -73,7 +75,7 @@ daemonize uninstall mydamon
 and list all "daemonized" php classes
 
 ```php
-daemonize services
+daemonize services --only-names
 ```
 
 ## Install
@@ -81,8 +83,8 @@ daemonize services
 Daemonize does not need to be associated to your PHP project. Prefer install as a global package and as root user.
 
 ```bash
-composer global require "byjg/php-daemonize=1.2.*"
-export PATH=/root/.composer/vendor/bin:$PATH    # put this in the .bashrc or /etc/environment
+composer global require "byjg/php-daemonize=1.3.*"
+sudo ln -s /root/.composer/vendor/bin/daemonize /usr/local/bin/daemonize
 ```
 
 If you want to share this installation with another users consider use the command `chmod a+x /root`. The root
@@ -103,7 +105,7 @@ tail -f /etc/tryme.txt
 On the second do:
 
 ```php
-sudo daemonize install tryme "\\ByJG\\Daemon\\Sample\\TryMe::process" "vendor/autoload.php" "."
+sudo daemonize install --template=upstart tryme "\\ByJG\\Daemon\\Sample\\TryMe::process" "vendor/autoload.php" "./"
 
 sudo service tryme start
 ```

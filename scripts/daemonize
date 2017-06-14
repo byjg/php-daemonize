@@ -11,7 +11,7 @@ require_once($autoload);
 
 use Symfony\Component\Console\Application;
 
-$application = new Application('PHP Daemonize by JG', '1.2.0');
+$application = new Application('PHP Daemonize by JG', '1.3.0');
 $application->add(new \ByJG\Daemon\Console\InstallCommand());
 $application->add(new \ByJG\Daemon\Console\UninstallCommand());
 $application->add(new \ByJG\Daemon\Console\RunCommand());
