@@ -122,7 +122,6 @@ class Daemonize
                 if (!self::isDaemonizeService($service)) {
                     throw new \Exception("Service '$svcName' was not created by PHP Daemonize");
                 }
-                shell_exec("service $svcName stop");
                 unlink($service);
             }
         }
