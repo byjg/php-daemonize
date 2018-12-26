@@ -3,11 +3,10 @@
 [![Code Climate](https://codeclimate.com/github/byjg/php-daemonize/badges/gpa.svg)](https://codeclimate.com/github/byjg/php-daemonize)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/byjg/php-daemonize/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/byjg/php-daemonize/?branch=master)
 
-## Description
 
 Transform any class in a *nix daemon process or cron job without changes or refactoring.
 
-## Motivation
+# Motivation
 
 Some times we need to create a cron tab or a process for running in background. The most of times we need to
 create a new class, probably in a different framework and have to set or even choose another language for create the
@@ -17,7 +16,7 @@ job/daemon.
 
 "Daemonize" is a script that create a "init.d" script and encapsulate or class enabling you to run it in the bash, for example.
 
-## How to
+# How to
 
 Suppose you have a pre-existing class for read some info from database and run some action with these data. For example:
 
@@ -78,7 +77,7 @@ and list all "daemonized" php classes
 daemonize services --only-names
 ```
 
-## Install
+# Install
 
 Daemonize does not need to be associated to your PHP project. Prefer install as a global package and as root user.
 
@@ -91,7 +90,7 @@ If you want to share this installation with another users consider use the comma
 directory will remain unreadable for them, but you'll can execute the script "daemonize".
 
 
-## Running a pre-installed demo
+# Running a pre-installed demo
 
 Open two terminals.
 
