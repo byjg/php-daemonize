@@ -6,6 +6,7 @@ use ByJG\Daemon\Runner;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class RunCommand extends Command
@@ -20,45 +21,48 @@ class RunCommand extends Command
                 InputArgument::REQUIRED,
                 'The PHP class and method like ClassName::Method'
             )
-            ->addArgument(
+            ->addOption(
                 'bootstrap',
-                InputArgument::OPTIONAL,
-                'The relative path from root directory for the bootstrap file, like vendor/autoload.php',
-                'vendor/autoload.php'
+                'b',
+                InputOption::VALUE_OPTIONAL,
+                'The relative path from root directory for the bootstrap file, like ./vendor/autoload.php',
+                getcwd() . '/vendor/autoload.php'
             )
-            ->addArgument(
+            ->addOption(
                 'rootdir',
-                InputArgument::OPTIONAL,
+                'r',
+                InputOption::VALUE_OPTIONAL,
                 'The root path where your application is installed',
-                getcwd() . "/"
+                getcwd()
             )
-            ->addArgument(
-                'args',
-                InputArgument::IS_ARRAY,
-                'is an optional arguments for your class'
+            ->addOption(
+                '--http-get',
+                "-g",
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'is an optional arguments for your class',
+                []
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $className = $input->getArgument('classname');
-        $bootstrap = $input->getArgument('bootstrap');
-        $rootPath = $input->getArgument('rootdir');
+        $rootPath = $input->getOption('rootdir');
+        $bootstrap = $rootPath . "/" . $input->getOption('bootstrap');
 
-        $realPathBootstrap = realpath($rootPath . $bootstrap);
-        $realPathRootPath = realpath($rootPath);
-
-        if (!file_exists($realPathRootPath)) {
-            throw new \Exception("The rootpath '$rootPath' does not exists");
-        }
-        chdir($realPathRootPath);
-
-        if (!file_exists($realPathBootstrap)) {
-            throw new \Exception("The bootstrap file '$bootstrap' does not exists");
+        if (!file_exists($rootPath)) {
+            throw new \Exception("The rootpath '$bootstrap' does not exists. Use absolute path or relative path from current directory.");
         }
 
-        require_once $realPathBootstrap;
-        $runner = new Runner($className, null, $input->getArgument('args'), false);
+        if (!file_exists($bootstrap)) {
+            throw new \Exception("The bootstrap file '$bootstrap' does not exists. Use a relative path from the root path.");
+        }
+
+        chdir($rootPath);
+        require_once $bootstrap;
+        $runner = new Runner($className, null, $input->getOption('http-get'), false);
         $runner->execute();
+
+        return 0;
     }
 }

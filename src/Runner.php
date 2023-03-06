@@ -75,14 +75,9 @@ class Runner
 
     protected function extractQueryParameters($consoleArgs)
     {
-        // Read parameters and convert to PHP $_GET variables
-        foreach ($consoleArgs as $pair) {
-            $arPair = explode("=", $pair);
-            if (sizeof($arPair) > 1) {
-                $_REQUEST[$arPair[0]] = $_GET[$arPair[0]] = implode('=', array_slice($arPair, 1));
-            }
-        }
         $_SERVER['QUERY_STRING'] = implode('&', $consoleArgs);
+        parse_str($_SERVER['QUERY_STRING'], $_GET);
+        parse_str($_SERVER['QUERY_STRING'], $_REQUEST);
         $_SERVER['REQUEST_URI'] = 'daemon.php';
     }
 

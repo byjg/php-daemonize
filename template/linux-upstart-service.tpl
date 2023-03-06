@@ -13,5 +13,5 @@ respawn limit 99 5
 
 script
     echo -n $"Starting $NAME: "
-    #PHPPATH# #DAEMONIZESERVICE#
+    #PHPPATH# #DAEMONIZESERVICE# run "#CLASS#" --bootstrap "#BOOTSTRAP#" --rootdir "#ROOTPATH#" #CONSOLEARGS#
 end script

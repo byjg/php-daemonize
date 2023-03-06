@@ -1,12 +1,14 @@
 # PHP Daemonize
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/37e7a7a0-402a-4add-a3bd-91b0c5cdc0ce/mini.png)](https://insight.sensiolabs.com/projects/37e7a7a0-402a-4add-a3bd-91b0c5cdc0ce)
-[![Code Climate](https://codeclimate.com/github/byjg/php-daemonize/badges/gpa.svg)](https://codeclimate.com/github/byjg/php-daemonize)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/byjg/php-daemonize/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/byjg/php-daemonize/?branch=master)
 
+[![Build Status](https://github.com/byjg/php-daemonize/actions/workflows/phpunit.yml/badge.svg?branch=master)](https://github.com/byjg/php-daemonize/actions/workflows/phpunit.yml)
+[![Opensource ByJG](https://img.shields.io/badge/opensource-byjg-success.svg)](http://opensource.byjg.com)
+[![GitHub source](https://img.shields.io/badge/Github-source-informational?logo=github)](https://github.com/byjg/php-daemonize/)
+[![GitHub license](https://img.shields.io/github/license/byjg/php-daemonize.svg)](https://opensource.byjg.com/opensource/licensing.html)
+[![GitHub release](https://img.shields.io/github/release/byjg/php-daemonize.svg)](https://github.com/byjg/php-daemonize/releases/)
 
 Transform any class in a *nix daemon process or cron job without changes or refactoring.
 
-# Motivation
+## Motivation
 
 Some times we need to create a cron tab or a process for running in background. The most of times we need to
 create a new class, probably in a different framework and have to set or even choose another language for create the
@@ -16,11 +18,12 @@ job/daemon.
 
 "Daemonize" is a script that create a "init.d" script and encapsulate or class enabling you to run it in the bash, for example.
 
-# How to
+## How to
 
 Suppose you have a pre-existing class for read some info from database and run some action with these data. For example:
 
 ```php
+<?php
 namespace Some\Name\Space;
 
 class MyExistingClass
@@ -36,25 +39,42 @@ class MyExistingClass
 }
 ```
 
-If you want transform this class and method in a linux daemon (or "daemonize" it) you have to first create a bootstrap php file.
-This file will tell to the script all setup you need to run this class.
+If you want transform this class and method in a linux daemon (or "daemonize" it) you have to first create a bootstrap php file. 
 
-The most simple bootstrap.php is:
+The most simple bootstrap is `vendor/autoload.php` but you can create a more complex bootstrap file if you need.
+
+Below is an example of a bootstrap file:
 
 ```php
 require_once __DIR__ . "/vendor/autoload.php";
+
+// Your code here
 ```
 
 Now, if you want to test it you can run the command:
 
 ```bash
-daemonize run "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relative/path/to/bootstrap.php" "/path/to/root"
+daemonize run \
+    "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" \
+    --bootstrap "relative/path/to/bootstrap.php" \
+    --rootdir "/path/to/root" \
+    --http-get "param1=value1&param2=value2"
+```
+
+You can test with:
+
+```bash
+daemonize run \
+    "\\ByJG\\Daemon\\Sample\\TryMe::ping"
 ```
 
 If everything is ok, now you can "daemonize" this class (as root):
 
 ```php
-daemonize install --template=upstart mydaemon "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" "relative/path/to/bootstrap.php" "/path/to/root"
+daemonize install --template=systemd mydaemon \
+    --class "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" \
+    --bootstrap "relative/path/to/bootstrap.php" \
+    --rootdire "/path/to/root"
 ```
 
 *note*: valid templates are: upstart or initd (default)
@@ -89,8 +109,7 @@ sudo ln -s /root/.composer/vendor/bin/daemonize /usr/local/bin/daemonize
 If you want to share this installation with another users consider use the command `chmod a+x /root`. The root
 directory will remain unreadable for them, but you'll can execute the script "daemonize".
 
-
-# Running a pre-installed demo
+## Running a pre-installed demo
 
 Open two terminals.
 
@@ -110,4 +129,3 @@ sudo service tryme start
 ```
 
 If everything is OK, will see on the first terminal a lot of lines added. Do not forget to run `sudo service tryme stop`
-

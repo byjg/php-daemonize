@@ -4,7 +4,7 @@ Description=#DESCRIPTION#
 
 [Service]
 Type=simple
-ExecStart=#PHPPATH# #DAEMONIZESERVICE#
+ExecStart=#PHPPATH# #DAEMONIZESERVICE# run "#CLASS#" --bootstrap "#BOOTSTRAP#" --rootdir "#ROOTPATH#" #CONSOLEARGS#
 Nice=5
 
 [Install]

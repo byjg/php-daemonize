@@ -26,17 +26,20 @@ class Daemonize
                 . implode(',', array_keys($targetPathAvailable))
             );
         }
-        $targetServicePath = $targetPathAvailable[$template];
 
+        $targetServicePath = $targetPathAvailable[$template];
         $templatePath = __DIR__ . "/../template/linux-" . $template . "-service.tpl";
 
         if (!file_exists($templatePath)) {
             throw new \Exception("Template '$templatePath' not found");
         }
 
-        $bootstrap = $curdir . '/' . $bootstrap;
-        if (!file_exists($bootstrap) && $check) {
-            throw new \Exception("Bootstrap '$bootstrap' not found");
+        if (!file_exists(realpath($curdir)) && $check) {
+            throw new \Exception("RootPath '" . $curdir . "' not found. Use an absolute path. e.g. /projects/example");
+        }
+
+        if (!file_exists($curdir . '/' . $bootstrap) && $check) {
+            throw new \Exception("Bootstrap '$bootstrap' not found. Use a relative path from root directory. e.g. vendor/autoload.php");
         }
 
         $autoload = realpath(__DIR__ . "/../vendor/autoload.php");
@@ -47,18 +50,15 @@ class Daemonize
             }
         }
 
+        $consoleArgsPrepared = '';
         if (!empty($consoleArgs)) {
             for ($i=0; $i<count($consoleArgs); $i++) {
-                $consoleArgs[$i] = str_replace('"', '\\"', $consoleArgs[$i]);
+                $consoleArgsPrepared .= " --http-get \"" . str_replace('"', '\\"', $consoleArgs[$i]) . "\" ";
             }
-            $consoleArgsPrepared = '[ "' . implode('", "', $consoleArgs) . '" ]';
-        } else {
-            $consoleArgsPrepared = "[ ]";
         }
 
         $serviceTemplatePath = __DIR__ . "/../template/_service.php.tpl";
-        $daemonizeService = __DIR__ . "/../services/$svcName.php";
-        $phpPath = PHP_BINARY;
+        $daemonizeService = realpath($_SERVER['argv'][0]);
 
         $vars = [
             '#DESCRIPTION#' => $description,
@@ -68,14 +68,12 @@ class Daemonize
             '#SVCNAME#' => $svcName,
             '#ROOTPATH#' => realpath($curdir),
             '#CONSOLEARGS#' => $consoleArgsPrepared,
-            '#PHPPATH#' => $phpPath,
+            '#PHPPATH#' => PHP_BINARY,
             '#SERVICETEMPLATEPATH#' => $serviceTemplatePath,
             '#DAEMONIZESERVICE#' => $daemonizeService,
         ];
 
         $templateStr = Daemonize::replaceVars($vars, file_get_contents($templatePath));
-
-        $serviceStr = Daemonize::replaceVars($vars, file_get_contents($serviceTemplatePath));
 
         // Check if is OK
         if ($check) {
@@ -95,8 +93,9 @@ class Daemonize
             throw new \Exception($error);
         });
         file_put_contents($targetServicePath, $templateStr);
-        shell_exec("chmod a+x $targetServicePath");
-        file_put_contents($daemonizeService, $serviceStr);
+        if ($template == 'initd') {
+            chmod($targetServicePath, 0755);
+        }
         restore_error_handler();
 
         return true;
