@@ -21,7 +21,7 @@ class Runner
 
     protected $daemon = true;
 
-    public function __construct($object, $svcName, $consoleArgs = [], $daemon = true)
+    public function __construct($object, $consoleArgs = [], $daemon = true)
     {
         $this->daemon = $daemon;
 
@@ -30,54 +30,20 @@ class Runner
         $this->methodName = $arr[1];
 
         // Prepare environment
-        if ($this->daemon) {
-            $this->prepareLogs($svcName);
-        }
+        $this->extractQueryParameters($consoleArgs);
 
-        try {
-            $this->extractQueryParameters($consoleArgs);
-
-            // Instantiate the class
-            if (!class_exists($className)) {
-                throw new \Exception("Could not found the class $className");
-            }
-            $this->instance = new $className();
-        } catch (Exception $ex) {
-            $this->writeToStderr("System Fail to Start: \n");
-            $this->writeToStderr('Message: ' . $ex->getMessage() . "\n");
-            $this->writeToStderr("Stack Trace:\n" . $ex->getTraceAsString());
-            $this->writeToStderr("\n\n");
+        // Instantiate the class
+        if (!class_exists($className)) {
+            throw new \Exception("Could not found the class $className");
         }
-    }
-
-    protected function prepareLogs($logname = null)
-    {
-        if (!file_exists(self::BASE_LOG_PATH)) {
-            mkdir(self::BASE_LOG_PATH);
-        }
-
-        if (empty($logname)) {
-            $logname = str_replace("\\", "_", strtolower($this->className)) . "." . strtolower($this->methodName);
-        }
-
-        if (
-            is_writable(self::BASE_LOG_PATH . '/' . $logname . '.log')
-            && is_writable(self::BASE_LOG_PATH . '/' . $logname . '.error.log')
-        ) {
-            fclose(STDIN);
-            fclose(STDOUT);
-            fclose(STDERR);
-            $this->stdIn = fopen('/dev/null', 'r');
-            $this->stdOut = fopen(self::BASE_LOG_PATH . '/' . $logname . '.log', 'ab');
-            $this->stdErr = fopen(self::BASE_LOG_PATH . '/' . $logname . '.error.log', 'ab');
-        }
+        $this->instance = new $className();
     }
 
     protected function extractQueryParameters($consoleArgs)
     {
-        $_SERVER['QUERY_STRING'] = implode('&', $consoleArgs);
-        parse_str($_SERVER['QUERY_STRING'], $_GET);
-        parse_str($_SERVER['QUERY_STRING'], $_REQUEST);
+        $_SERVER['QUERY_STRING'] = http_build_query($consoleArgs);
+        $_GET = $consoleArgs;
+        $_REQUEST = $consoleArgs;
         $_SERVER['REQUEST_URI'] = 'daemon.php';
     }
 
@@ -86,40 +52,16 @@ class Runner
         $instance = $this->instance;
         $method = $this->methodName;
 
-        $this->writeToStdout("Service " . $this->className . "::" . $this->methodName . " started at " . date('c') . "\n");
-
         $continue = true;
 
         // Execute routine
         while ($continue) {
-            try {
-                $output = $instance->$method();
-                if (!empty($output)) {
-                    $this->writeToStdout($output);
-                }
-            } catch (Exception $ex) {
-                $this->writeToStderr(date('c') . ' [' . get_class($ex) . '] in ' . $ex->getFile() . ' at line ' . $ex->getLine() . ' -- ' . "\n");
-                $this->writeToStderr('Message: ' . $ex->getMessage() . "\n");
-                $this->writeToStderr("Stack Trace:\n" . $ex->getTraceAsString());
-                $this->writeToStderr("\n\n");
-            }
-
+            $instance->$method();
             $continue = $this->daemon;
 
             if ($continue) {
                 usleep(self::SLEEP_SERVICE * 1000);
             }
         }
-        //while (true)
-    }
-
-    public function writeToStdout($msg)
-    {
-        fwrite($this->stdOut, $msg);
-    }
-
-    public function writeToStderr($msg)
-    {
-        fwrite($this->stdErr, $msg);
     }
 }

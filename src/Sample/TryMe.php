@@ -19,4 +19,11 @@ class TryMe
     {
         return "pong";
     }
+
+    public function saveJson()
+    {
+        file_put_contents('/tmp/tryme_test.txt', $_SERVER['QUERY_STRING'] . "\n");
+        file_put_contents('/tmp/tryme_test.txt', json_encode($_REQUEST) . "\n", FILE_APPEND);
+        file_put_contents('/tmp/tryme_test.txt', json_encode($_REQUEST), FILE_APPEND);
+    }
 }

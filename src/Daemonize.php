@@ -4,6 +4,22 @@ namespace ByJG\Daemon;
 
 class Daemonize
 {
+    protected static $writer = null;
+
+    public static function setWriter(?ServiceWriter $writer)
+    {
+        self::$writer = $writer;
+    }
+
+    public static function getWriter()
+    {
+        if (self::$writer == null) {
+            self::$writer = new ServiceWriter();
+        }
+
+        return self::$writer;
+    }
+
     public static function  install(
         $svcName,
         $className,
@@ -89,14 +105,7 @@ class Daemonize
             }
         }
 
-        set_error_handler(function ($number, $error) {
-            throw new \Exception($error);
-        });
-        file_put_contents($targetServicePath, $templateStr);
-        if ($template == 'initd') {
-            chmod($targetServicePath, 0755);
-        }
-        restore_error_handler();
+        Daemonize::getWriter()->writeService($targetServicePath, $templateStr, $template == 'initd' ? 0755 : null);
 
         return true;
     }

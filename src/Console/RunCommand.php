@@ -26,7 +26,7 @@ class RunCommand extends Command
                 'b',
                 InputOption::VALUE_OPTIONAL,
                 'The relative path from root directory for the bootstrap file, like ./vendor/autoload.php',
-                getcwd() . '/vendor/autoload.php'
+                'vendor/autoload.php'
             )
             ->addOption(
                 'rootdir',
@@ -41,6 +41,12 @@ class RunCommand extends Command
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'is an optional arguments for your class',
                 []
+            )
+            ->addOption(
+                'daemon',
+                'd',
+                InputOption::VALUE_NONE,
+                'Run as a daemon'
             );
     }
 
@@ -60,7 +66,12 @@ class RunCommand extends Command
 
         chdir($rootPath);
         require_once $bootstrap;
-        $runner = new Runner($className, null, $input->getOption('http-get'), false);
+
+        $httpGet = [];
+        if (!empty($input->getOption('http-get'))) {
+            parse_str(implode('&', $input->getOption('http-get')), $httpGet);
+        }
+        $runner = new Runner($className, $httpGet, $input->getOption('daemon'));
         $runner->execute();
 
         return 0;
