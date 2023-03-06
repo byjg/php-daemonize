@@ -77,6 +77,10 @@ class DaemonizeTest extends TestCase
      */
     public function testCommandLine()
     {
+        if (posix_getuid() !== 0) {
+            $this->markTestSkipped('This test will fail if you don\'t have root permission');
+        }
+
         $command = __DIR__ . "/../scripts/daemonize install " .
             "--template systemd " . 
             "--description 'Custom Description' " .
@@ -90,7 +94,6 @@ class DaemonizeTest extends TestCase
             "test";
 
         shell_exec($command);
-
 
         $this->assertEquals($this->read(__DIR__ . '/expected/test-with-env.env'), $this->read('/etc/daemonize/test.env'));
         $this->assertEquals($this->read(__DIR__ . '/expected/test-with-env.service'), $this->read('/lib/systemd/system/test.service'));
@@ -110,6 +113,10 @@ class DaemonizeTest extends TestCase
      */
     public function testInstall()
     {
+        if (posix_getuid() !== 0) {
+            $this->markTestSkipped('This test will fail if you don\'t have root permission');
+        }
+
         $result = Daemonize::install('test', 'ByJG\Daemon\Sample\TryMe::saveJson', 'vendor/autoload.php', __DIR__ . '/../', "systemd", 'Custom Description', ["a" => "1", "b" => 2], ['APP_ENV' => 'test', 'TEST' => 'true']);
 
         $this->assertEquals($this->read(__DIR__ . '/expected/test-with-env.env'), $this->read('/etc/daemonize/test.env'));
