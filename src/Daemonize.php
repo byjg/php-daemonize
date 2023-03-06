@@ -35,7 +35,7 @@ class Daemonize
         $targetPathAvailable = [
             'initd' => "/etc/init.d/$svcName",
             'upstart' => "/etc/init/$svcName.conf",
-            'systemd' => "/lib/systemd/system/$svcName.service"
+            'systemd' => "/etc/systemd/system/$svcName.service"
         ];
         if (!isset($targetPathAvailable[$template])) {
             throw new \Exception(
@@ -126,7 +126,7 @@ class Daemonize
         $list = [
             "/etc/init.d/$svcName",
             "/etc/init/$svcName.conf",
-            "/lib/systemd/system/$svcName.service",
+            "/etc/systemd/system/$svcName.service",
             '/etc/daemonize/' . $svcName . '.env'
         ];
 
@@ -163,7 +163,7 @@ class Daemonize
     {
         $list1 = glob("/etc/init.d/*");
         $list2 = glob("/etc/init/*.conf");
-        $list3 = glob("/lib/systemd/system/*.service");
+        $list3 = glob("/etc/systemd/system/*.service");
         $list = array_merge($list1, $list2, $list3);
         $return = [];
 
