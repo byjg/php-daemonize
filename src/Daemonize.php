@@ -28,6 +28,7 @@ class Daemonize
         $template,
         $description,
         $consoleArgs,
+        $environment,
         $check = true
     )
     {
@@ -68,13 +69,13 @@ class Daemonize
 
         $consoleArgsPrepared = '';
         if (!empty($consoleArgs)) {
-            for ($i=0; $i<count($consoleArgs); $i++) {
-                $consoleArgsPrepared .= " --http-get \"" . str_replace('"', '\\"', $consoleArgs[$i]) . "\" ";
-            }
+            $consoleArgsPrepared = '--http-get ' . http_build_query($consoleArgs, '', ' --http-get ');
         }
 
+        $environmentPrepared = '/etc/daemonize/' . $svcName . '.env';
+
         $serviceTemplatePath = __DIR__ . "/../template/_service.php.tpl";
-        $daemonizeService = realpath($_SERVER['argv'][0]);
+        $daemonizeService = realpath(__DIR__ . "/../scripts/daemonize");
 
         $vars = [
             '#DESCRIPTION#' => $description,
@@ -84,6 +85,7 @@ class Daemonize
             '#SVCNAME#' => $svcName,
             '#ROOTPATH#' => realpath($curdir),
             '#CONSOLEARGS#' => $consoleArgsPrepared,
+            '#ENVIRONMENT#' => $environmentPrepared,
             '#PHPPATH#' => PHP_BINARY,
             '#SERVICETEMPLATEPATH#' => $serviceTemplatePath,
             '#DAEMONIZESERVICE#' => $daemonizeService,
@@ -105,6 +107,7 @@ class Daemonize
             }
         }
 
+        Daemonize::getWriter()->writeEnvironment($environmentPrepared, $environment);
         Daemonize::getWriter()->writeService($targetServicePath, $templateStr, $template == 'initd' ? 0755 : null);
 
         return true;
@@ -123,22 +126,23 @@ class Daemonize
         $list = [
             "/etc/init.d/$svcName",
             "/etc/init/$svcName.conf",
-            "/lib/systemd/system/$svcName.service"
+            "/lib/systemd/system/$svcName.service",
+            '/etc/daemonize/' . $svcName . '.env'
         ];
 
         $found = false;
         foreach ($list as $service) {
             if (file_exists($service)) {
                 $found = true;
-                if (!self::isDaemonizeService($service)) {
-                    throw new \Exception("Service '$svcName' was not created by PHP Daemonize");
+                if (strpos($service, ".env") === false && !self::isDaemonizeService($service)) {
+                    throw new DaemonizeException("Service '$svcName' was not created by PHP Daemonize");
                 }
                 unlink($service);
             }
         }
 
         if (!$found) {
-            throw new \Exception("Service '$svcName' does not exists");
+            throw new DaemonizeException("Service '$svcName' does not exists");
         }
 
         restore_error_handler();

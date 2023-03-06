@@ -66,11 +66,20 @@ class InstallCommand extends Command
                 'g',
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
                 'is an optional arguments for your class'
+            )
+            ->addOption(
+                'env',
+                'e',
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'Set environment variables for the service'
             );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        parse_str(implode("&", $input->getOption('http-get')), $httpGet);
+        parse_str(implode("&", $input->getOption('env')), $env);
+
         Daemonize::install(
             $input->getArgument('service'),
             $input->getOption('class'),
@@ -78,7 +87,8 @@ class InstallCommand extends Command
             $input->getOption('rootdir'),
             $input->getOption('template'),
             $input->getOption('description'),
-            $input->getOption('http-get'),
+            $httpGet,
+            $env,
             !$input->getOption('no-check')
         );
 

@@ -4,13 +4,22 @@ use \PHPUnit\Framework\TestCase;
 
 class RunnerTest extends TestCase
 {
-
-    public function setUp(): void
+    protected function clearTest()
     {
         if (file_exists('/tmp/tryme_test.txt')) {
             unlink('/tmp/tryme_test.txt');
         }
         $this->assertFalse(file_exists('/tmp/tryme_test.txt'));
+    }
+
+    public function setUp(): void
+    {
+        $this->clearTest();
+    }
+
+    public function tearDown(): void
+    {
+        $this->clearTest();
     }
 
     public function testExecute()

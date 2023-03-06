@@ -4,6 +4,7 @@ Description=#DESCRIPTION#
 
 [Service]
 Type=simple
+EnvironmentFile=#ENVIRONMENT#
 ExecStart=#PHPPATH# #DAEMONIZESERVICE# run "#CLASS#" --bootstrap "#BOOTSTRAP#" --rootdir "#ROOTPATH#" #CONSOLEARGS# --daemon
 Nice=5
 

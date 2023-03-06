@@ -67,10 +67,7 @@ class RunCommand extends Command
         chdir($rootPath);
         require_once $bootstrap;
 
-        $httpGet = [];
-        if (!empty($input->getOption('http-get'))) {
-            parse_str(implode('&', $input->getOption('http-get')), $httpGet);
-        }
+        parse_str(implode('&', $input->getOption('http-get')), $httpGet);
         $runner = new Runner($className, $httpGet, $input->getOption('daemon'));
         $runner->execute();
 
