@@ -81,7 +81,8 @@ class DaemonizeTest extends TestCase
             $this->markTestSkipped('This test will fail if you don\'t have root permission');
         }
 
-        if (trim(shell_exec("ps -p 1 -o comm=")) !== "systemd") {
+        $psResult = shell_exec("ps -p 1 -o comm=");
+        if (!empty($psResult) && trim($psResult) !== "systemd") {
             $this->markTestSkipped('This test will fail if you don\'t have systemd');
         };
 
@@ -121,7 +122,8 @@ class DaemonizeTest extends TestCase
             $this->markTestSkipped('This test will fail if you don\'t have root permission');
         }
 
-        if (trim(shell_exec("ps -p 1 -o comm=")) !== "systemd") {
+        $psResult = shell_exec("ps -p 1 -o comm=");
+        if (!empty($psResult) && trim($psResult) !== "systemd") {
             $this->markTestSkipped('This test will fail if you don\'t have systemd');
         };
 

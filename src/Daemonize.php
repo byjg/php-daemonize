@@ -154,6 +154,9 @@ class Daemonize
             throw new \Exception($error);
         });
 
+        if (!file_exists($filename)) {
+            return false;
+        }
         $contents = file_get_contents($filename);
 
         return (strpos($contents, 'PHP_DAEMONIZE') !== false);
