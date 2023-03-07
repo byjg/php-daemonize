@@ -82,7 +82,7 @@ class DaemonizeTest extends TestCase
         }
 
         $psResult = shell_exec("ps -p 1 -o comm=");
-        if (!empty($psResult) && trim($psResult) !== "systemd") {
+        if (empty($psResult) || trim($psResult) !== "systemd") {
             $this->markTestSkipped('This test will fail if you don\'t have systemd');
         };
 
@@ -123,7 +123,7 @@ class DaemonizeTest extends TestCase
         }
 
         $psResult = shell_exec("ps -p 1 -o comm=");
-        if (!empty($psResult) && trim($psResult) !== "systemd") {
+        if (empty($psResult) || trim($psResult) !== "systemd") {
             $this->markTestSkipped('This test will fail if you don\'t have systemd');
         };
 
