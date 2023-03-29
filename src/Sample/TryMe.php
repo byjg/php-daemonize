@@ -13,11 +13,12 @@ class TryMe
     {
         file_put_contents(sys_get_temp_dir() . '/tryme.txt', date('c') . "\n", FILE_APPEND);
         file_put_contents(sys_get_temp_dir() . '/tryme.txt', print_r($_REQUEST, true), FILE_APPEND);
+        file_put_contents(sys_get_temp_dir() . '/tryme.txt', print_r(getenv('TEST'), true), FILE_APPEND);
     }
 
     public function ping()
     {
-        return "pong";
+        echo "pong - " . getenv('TEST') . "\n";
     }
 
     public function saveJson()

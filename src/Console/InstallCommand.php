@@ -20,7 +20,7 @@ class InstallCommand extends Command
                 'template',
                 't',
                 InputOption::VALUE_REQUIRED,
-                'Defines the default service template -- initd, upstart or systemd',
+                'Defines the default service template -- systemd, crond, initd or upstart',
                 'systemd'
             )
             ->addOption(

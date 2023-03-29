@@ -74,10 +74,15 @@ If everything is ok, now you can "daemonize" this class (as root):
 daemonize install --template=systemd mydaemon \
     --class "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" \
     --bootstrap "relative/path/to/bootstrap.php" \
-    --rootdire "/path/to/root"
+    --rootdir "/path/to/root"
 ```
 
-*note*: valid templates are: upstart or initd (default)
+*note*: valid templates are:
+
+- systemd (default)
+- upstart
+- initd
+- crond
 
 Now for start or stop the service you need only
 

@@ -34,6 +34,7 @@ class Daemonize
     {
         $targetPathAvailable = [
             'initd' => "/etc/init.d/$svcName",
+            'crond' => "/etc/cron.d/$svcName",
             'upstart' => "/etc/init/$svcName.conf",
             'systemd' => "/etc/systemd/system/$svcName.service"
         ];
@@ -89,6 +90,16 @@ class Daemonize
             '#PHPPATH#' => PHP_BINARY,
             '#SERVICETEMPLATEPATH#' => $serviceTemplatePath,
             '#DAEMONIZESERVICE#' => $daemonizeService,
+            "#ENVCMDLINE#" => implode(
+                ' ',
+                array_map(
+                    function ($v, $k) {
+                        return "$k=\"$v\"";
+                    },
+                    $environment,
+                    array_keys($environment)
+                )
+            )
         ];
 
         $templateStr = Daemonize::replaceVars($vars, file_get_contents($templatePath));
@@ -127,7 +138,8 @@ class Daemonize
             "/etc/init.d/$svcName",
             "/etc/init/$svcName.conf",
             "/etc/systemd/system/$svcName.service",
-            '/etc/daemonize/' . $svcName . '.env'
+            '/etc/daemonize/' . $svcName . '.env',
+            '/etc/cron.d/' . $svcName,
         ];
 
         $found = false;
@@ -164,23 +176,28 @@ class Daemonize
 
     public static function listServices()
     {
-        $list1 = glob("/etc/init.d/*");
-        $list2 = glob("/etc/init/*.conf");
-        $list3 = glob("/etc/systemd/system/*.service");
-        $list = array_merge($list1, $list2, $list3);
+        $list = [
+            "initd" => glob("/etc/init.d/*"),
+            "crond" => glob("/etc/cron.d/*"),
+            "upstart" => glob("/etc/init/*.conf"),
+            "systemd" => glob("/etc/systemd/system/*.service")
+        ];
         $return = [];
 
-        foreach ($list as $filename) {
-            if (self::isDaemonizeService($filename)) {
-                $return[] = str_replace(
-                    '.service',
-                    '',
-                    str_replace(
-                        '.conf',
+        foreach ($list as $svcType => $filenames) {
+            foreach ($filenames as $filename) {
+                if (self::isDaemonizeService($filename)) {
+                    $return[] = $svcType . ": " . 
+                        str_replace(
+                        '.service',
                         '',
-                        basename($filename)
-                    )
-                );
+                        str_replace(
+                            '.conf',
+                            '',
+                            basename($filename)
+                        )
+                    );
+                }
             }
         }
 
