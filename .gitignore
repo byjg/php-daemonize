@@ -4,3 +4,4 @@ composer.lock
 vendor
 .idea
 services/*.php
+.phpunit.result.cache

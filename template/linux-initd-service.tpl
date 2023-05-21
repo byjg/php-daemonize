@@ -21,7 +21,8 @@ PIDFILE=/var/run/$NAME.pid
 
 start() {
     echo -n $"Starting $NAME: "
-    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --exec #PHPPATH# #DAEMONIZESERVICE#"
+    source #ENVIROMENT#
+    start-stop-daemon --start --quiet --background --make-pidfile --pidfile $PIDFILE --exec -- #PHPPATH# #DAEMONIZESERVICE# run "#CLASS#" --bootstrap "#BOOTSTRAP#" --rootdir "#ROOTPATH#" #CONSOLEARGS# --daemonize --pidfile $PIDFILE --log $log --daemon
     case "$?" in
         0) echo "OK!" ;;
         1) echo "already started" ;;

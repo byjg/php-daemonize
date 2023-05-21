@@ -1,0 +1,12 @@
+# DO NOT REMOVE OR CHANGE THIS LINE - PHP_DAEMONIZE #
+[Unit]
+Description=Custom Description
+
+[Service]
+Type=simple
+EnvironmentFile=/etc/daemonize/test.env
+ExecStart=PHP_BINARY CURDIR/scripts/daemonize run "ByJG\\Daemon\\Sample\\TryMe::saveJson" --bootstrap "vendor/autoload.php" --rootdir "CURDIR"  --daemon
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

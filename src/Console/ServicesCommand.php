@@ -23,7 +23,7 @@ class ServicesCommand extends Command
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $list = Daemonize::listServices();
 
@@ -31,7 +31,7 @@ class ServicesCommand extends Command
 
         if ($input->getOption('only-names')) {
             $output->writeln($list);
-            return;
+            return 0;
         }
 
         $output->writeln("");
@@ -44,5 +44,7 @@ class ServicesCommand extends Command
             }
         }
         $output->writeln("");
+
+        return 0;
     }
 }
