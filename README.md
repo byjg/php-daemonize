@@ -134,3 +134,13 @@ sudo service tryme start
 ```
 
 If everything is OK, will see on the first terminal a lot of lines added. Do not forget to run `sudo service tryme stop`
+
+## Dependencies
+
+```mermaid  
+flowchart TD  
+    byjg/daemonize --> symfone/console  
+```
+
+----  
+[Open source ByJG](http://opensource.byjg.com)
