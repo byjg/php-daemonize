@@ -104,10 +104,10 @@ daemonize services --only-names
 
 # Install
 
-Daemonize does not need to be associated to your PHP project. Prefer install as a global package and as root user.
+Daemonize does not need to be associated to your PHP project. You can either as a global package or as a local package.
 
 ```bash
-composer global require "byjg/php-daemonize=1.3.*"
+composer global require "byjg/php-daemonize"
 sudo ln -s /root/.composer/vendor/bin/daemonize /usr/local/bin/daemonize
 ```
 
