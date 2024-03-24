@@ -16,9 +16,11 @@ class TryMe
         file_put_contents(sys_get_temp_dir() . '/tryme.txt', print_r(getenv('TEST'), true), FILE_APPEND);
     }
 
-    public function ping()
+    public function ping($arg1, $arg2 = null)
     {
-        echo "pong - " . getenv('TEST') . "\n";
+        $result = "pong - $arg1 - $arg2\n";
+        echo $result;
+        file_put_contents(sys_get_temp_dir() . '/tryme_test.txt', "$result", FILE_APPEND);
     }
 
     public function saveJson()

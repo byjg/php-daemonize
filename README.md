@@ -66,6 +66,8 @@ You can test with:
 ```bash
 daemonize run \
     "\\ByJG\\Daemon\\Sample\\TryMe::ping"
+    --arg value1
+    --arg value2
 ```
 
 If everything is ok, now you can "daemonize" this class (as root):

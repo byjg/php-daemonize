@@ -43,6 +43,13 @@ class RunCommand extends Command
                 []
             )
             ->addOption(
+                '--arg',
+                "a",
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
+                'is an optional arguments for your class',
+                []
+            )
+            ->addOption(
                 'daemon',
                 'd',
                 InputOption::VALUE_NONE,
@@ -68,7 +75,7 @@ class RunCommand extends Command
         require_once $bootstrap;
 
         parse_str(implode('&', $input->getOption('http-get')), $httpGet);
-        $runner = new Runner($className, $httpGet, $input->getOption('daemon'));
+        $runner = new Runner($className, $input->getOption("arg"), $httpGet, $input->getOption('daemon'));
         $runner->execute();
 
         return 0;
