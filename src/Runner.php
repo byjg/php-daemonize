@@ -21,7 +21,9 @@ class Runner
 
     protected $daemon = true;
 
-    public function __construct($object, $consoleArgs = [], $daemon = true)
+    protected $consoleArgs = [];
+
+    public function __construct($object, $consoleArgs = [], $httpGet = [], $daemon = true)
     {
         $this->daemon = $daemon;
 
@@ -30,7 +32,8 @@ class Runner
         $this->methodName = $arr[1];
 
         // Prepare environment
-        $this->extractQueryParameters($consoleArgs);
+        $this->extractQueryParameters($httpGet);
+        $this->consoleArgs = $consoleArgs;
 
         // Instantiate the class
         if (!class_exists($className)) {
@@ -39,11 +42,11 @@ class Runner
         $this->instance = new $className();
     }
 
-    protected function extractQueryParameters($consoleArgs)
+    protected function extractQueryParameters($httpGet)
     {
-        $_SERVER['QUERY_STRING'] = http_build_query($consoleArgs);
-        $_GET = $consoleArgs;
-        $_REQUEST = $consoleArgs;
+        $_SERVER['QUERY_STRING'] = http_build_query($httpGet);
+        $_GET = $httpGet;
+        $_REQUEST = $httpGet;
         $_SERVER['REQUEST_URI'] = 'daemon.php';
     }
 
@@ -56,7 +59,7 @@ class Runner
 
         // Execute routine
         while ($continue) {
-            $instance->$method();
+            call_user_func_array([$instance, $method], $this->consoleArgs);
             $continue = $this->daemon;
 
             if ($continue) {
