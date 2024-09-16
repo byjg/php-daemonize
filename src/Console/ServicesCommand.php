@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ServicesCommand extends Command
 {
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setName('services')
