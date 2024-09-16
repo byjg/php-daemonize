@@ -4,14 +4,20 @@ namespace ByJG\Daemon;
 
 class ServiceWriter
 {
-    protected $overridePath = null;
+    protected ?string $overridePath = null;
 
-    public function __construct($overridePath = null)
+    public function __construct(?string $overridePath = null)
     {
         $this->overridePath = $overridePath;
     }
 
-    protected function writeFile($path, $contents)
+    /**
+     * @param string $path
+     * @param string $contents
+     * @return void
+     * @throws DaemonizeException
+     */
+    protected function writeFile(string $path, string $contents): void
     {
         if (!is_null($this->overridePath)) {
             $path = $this->overridePath . '/' . basename($path);
@@ -29,7 +35,13 @@ class ServiceWriter
         restore_error_handler();
     }
 
-    public function writeService($path, $contents, $chmod = null)
+    /**
+     * @param string $path
+     * @param string $contents
+     * @param int|null $chmod
+     * @throws DaemonizeException
+     */
+    public function writeService(string $path, string $contents, int $chmod = null): void
     {
         $this->writeFile($path, $contents);
 
@@ -38,7 +50,12 @@ class ServiceWriter
         }
     }
 
-    public function writeEnvironment($path, $environment)
+    /**
+     * @param string $path
+     * @param array $environment
+     * @throws DaemonizeException
+     */
+    public function writeEnvironment(string $path, array $environment): void
     {
         $contents = "";
         if (!empty($environment)) {

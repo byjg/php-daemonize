@@ -66,12 +66,14 @@ class RunnerTest extends TestCase
 
     public function testCli()
     {
+        /** @psalm-suppress ForbiddenCode */
         shell_exec( __DIR__ . '/../scripts/daemonize run \\\ByJG\\\Daemon\\\Sample\\\TryMe::saveJson --http-get a=2 --http-get b=3 --rootdir ' . __DIR__ . '/..');
         $this->assertEquals("a=2&b=3\n{\"a\":\"2\",\"b\":\"3\"}\n{\"a\":\"2\",\"b\":\"3\"}", file_get_contents('/tmp/tryme_test.txt'));
     }
 
     public function testCliSingleParam()
     {
+        /** @psalm-suppress ForbiddenCode */
         shell_exec( __DIR__ . '/../scripts/daemonize run \\\ByJG\\\Daemon\\\Sample\\\TryMe::saveJson --http-get a --http-get b --rootdir ' . __DIR__ . '/..');
         $this->assertEquals("a=&b=\n{\"a\":\"\",\"b\":\"\"}\n{\"a\":\"\",\"b\":\"\"}", file_get_contents('/tmp/tryme_test.txt'));
     }
@@ -120,6 +122,7 @@ class RunnerTest extends TestCase
 
     public function testCliArg()
     {
+        /** @psalm-suppress ForbiddenCode */
         shell_exec( __DIR__ . '/../scripts/daemonize run \\\ByJG\\\Daemon\\\Sample\\\TryMe::ping --arg 1 --arg 2 --rootdir ' . __DIR__ . '/..');
         $this->assertEquals("pong - 1 - 2\n", file_get_contents('/tmp/tryme_test.txt'));
     }
