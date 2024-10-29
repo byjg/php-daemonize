@@ -15,15 +15,15 @@ class Runner
     protected $stdOut = STDOUT;
     protected $stdErr = STDERR;
 
-    protected $className = null;
-    protected $methodName = null;
-    protected $instance = null;
+    protected ?string $className = null;
+    protected ?string $methodName = null;
+    protected mixed $instance = null;
 
-    protected $daemon = true;
+    protected bool $daemon = true;
 
-    protected $consoleArgs = [];
+    protected array $consoleArgs = [];
 
-    public function __construct($object, $consoleArgs = [], $httpGet = [], $daemon = true)
+    public function __construct(string $object, array $consoleArgs = [], array $httpGet = [], bool $daemon = true)
     {
         $this->daemon = $daemon;
 
@@ -42,7 +42,7 @@ class Runner
         $this->instance = new $className();
     }
 
-    protected function extractQueryParameters($httpGet)
+    protected function extractQueryParameters(array $httpGet): void
     {
         $_SERVER['QUERY_STRING'] = http_build_query($httpGet);
         $_GET = $httpGet;
@@ -50,7 +50,7 @@ class Runner
         $_SERVER['REQUEST_URI'] = 'daemon.php';
     }
 
-    public function execute()
+    public function execute(): void
     {
         $instance = $this->instance;
         $method = $this->methodName;

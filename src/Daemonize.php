@@ -4,14 +4,14 @@ namespace ByJG\Daemon;
 
 class Daemonize
 {
-    protected static $writer = null;
+    protected static ?ServiceWriter $writer = null;
 
-    public static function setWriter(?ServiceWriter $writer)
+    public static function setWriter(?ServiceWriter $writer): void
     {
         self::$writer = $writer;
     }
 
-    public static function getWriter()
+    public static function getWriter(): ?ServiceWriter
     {
         if (self::$writer == null) {
             self::$writer = new ServiceWriter();
@@ -20,6 +20,9 @@ class Daemonize
         return self::$writer;
     }
 
+    /**
+     * @throws \Exception
+     */
     public static function  install(
         $svcName,
         $className,
@@ -30,7 +33,7 @@ class Daemonize
         $consoleArgs,
         $environment,
         $check = true
-    )
+    ): bool
     {
         $targetPathAvailable = [
             'initd' => "/etc/init.d/$svcName",
@@ -93,6 +96,11 @@ class Daemonize
             "#ENVCMDLINE#" => implode(
                 ' ',
                 array_map(
+                    /**
+                     * @param $v
+                     * @param $k
+                     * @return string
+                     */
                     function ($v, $k) {
                         return "$k=\"$v\"";
                     },
@@ -124,15 +132,18 @@ class Daemonize
         return true;
     }
 
-    protected static function replaceVars($vars, $text)
+    protected static function replaceVars(array $vars, string $text): string
     {
-        foreach ($vars as $searchFor=>$replace) {
+        foreach ($vars as $searchFor => $replace) {
             $text = str_replace($searchFor, $replace, $text);
         }
         return $text;
     }
 
-    public static function uninstall($svcName)
+    /**
+     * @throws DaemonizeException
+     */
+    public static function uninstall(string $svcName): void
     {
         $list = [
             "/etc/init.d/$svcName",
@@ -160,7 +171,7 @@ class Daemonize
         restore_error_handler();
     }
 
-    protected static function isDaemonizeService($filename)
+    protected static function isDaemonizeService(string $filename): bool
     {
         set_error_handler(function ($number, $error) {
             throw new \Exception($error);
@@ -171,10 +182,10 @@ class Daemonize
         }
         $contents = file_get_contents($filename);
 
-        return (strpos($contents, 'PHP_DAEMONIZE') !== false);
+        return (str_contains($contents, 'PHP_DAEMONIZE'));
     }
 
-    public static function listServices()
+    public static function listServices(): array
     {
         $list = [
             "initd" => glob("/etc/init.d/*"),
