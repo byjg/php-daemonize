@@ -12,16 +12,22 @@ $autoload = realpath(__DIR__."/../vendor/autoload.php");
 if (!file_exists($autoload)) {
     $autoload = realpath(__DIR__."/../../../autoload.php");
     if (!file_exists($autoload)) {
-        throw new \Exception('Autoload not found. Did you run `composer dump-autload`?');
+        throw new Exception('Autoload not found. Did you run `composer dump-autload`?');
     }
 }
 require_once($autoload);
 
+use ByJG\Daemon\Console\CallCommand;
+use ByJG\Daemon\Console\InstallCommand;
+use ByJG\Daemon\Console\RunCommand;
+use ByJG\Daemon\Console\ServicesCommand;
+use ByJG\Daemon\Console\UninstallCommand;
 use Symfony\Component\Console\Application;
 
 $application = new Application('PHP Daemonize by JG', '4.9.1');
-$application->add(new \ByJG\Daemon\Console\InstallCommand());
-$application->add(new \ByJG\Daemon\Console\UninstallCommand());
-$application->add(new \ByJG\Daemon\Console\RunCommand());
-$application->add(new \ByJG\Daemon\Console\ServicesCommand());
+$application->add(new InstallCommand());
+$application->add(new UninstallCommand());
+$application->add(new RunCommand());
+$application->add(new CallCommand());
+$application->add(new ServicesCommand());
 $application->run();

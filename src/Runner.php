@@ -3,6 +3,8 @@
 namespace ByJG\Daemon;
 
 use Exception;
+use ReflectionClass;
+use ReflectionException;
 
 class Runner
 {
@@ -23,7 +25,7 @@ class Runner
 
     protected array $consoleArgs = [];
 
-    public function __construct(string $object, array $consoleArgs = [], array $httpGet = [], bool $daemon = true)
+    public function __construct(string $object, array $consoleArgs = [], bool $daemon = true)
     {
         $this->daemon = $daemon;
 
@@ -32,7 +34,6 @@ class Runner
         $this->methodName = $arr[1];
 
         // Prepare environment
-        $this->extractQueryParameters($httpGet);
         $this->consoleArgs = $consoleArgs;
 
         // Instantiate the class
@@ -40,14 +41,6 @@ class Runner
             throw new \Exception("Could not found the class $className");
         }
         $this->instance = new $className();
-    }
-
-    protected function extractQueryParameters(array $httpGet): void
-    {
-        $_SERVER['QUERY_STRING'] = http_build_query($httpGet);
-        $_GET = $httpGet;
-        $_REQUEST = $httpGet;
-        $_SERVER['REQUEST_URI'] = 'daemon.php';
     }
 
     public function execute(): void
@@ -66,5 +59,28 @@ class Runner
                 usleep(self::SLEEP_SERVICE * 1000);
             }
         }
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function showDocs()
+    {
+        $reflection = new ReflectionClass($this->instance);
+        $method = $reflection->getMethod($this->methodName);
+        $docs = $method->getDocComment();
+
+        $docs = preg_replace('/( *\/\*\*[\r\n]| *\*\/? *)/', '', $docs);
+
+        // get the current script name
+        $docs .= "\nUsage: \n";
+        $docs .= $_SERVER['argv'][0] . " run \"" . str_replace('\\', '\\\\', $this->className . "::" . $this->methodName) . "\" ";
+
+        foreach ($method->getParameters() as $param) {
+            $delimiter = $param->isOptional() ? "[]" : "<>";
+            $docs .= "--arg " . $delimiter[0] . $param->name .  $delimiter[1] . " ";
+        }
+
+        echo $docs;
     }
 }

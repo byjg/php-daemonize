@@ -8,140 +8,42 @@
 
 Transform any class in a *nix daemon process or cron job without changes or refactoring.
 
-## Motivation
+## Features
 
-Some times we need to create a cron tab or a process for running in background. The most of times we need to
-create a new class, probably in a different framework and have to set or even choose another language for create the
-job/daemon.
+Allow you to do the following without change your pre-existing class:
+- Create a *nix daemon process from any PHP class
+- Enable call any get RESt endpoint from the shell script
+- Enable call any public method from the shell script
 
-"Daemonize" enables you to can create a linux daemon or a job for use in a cron tab without change you pre-existing class.
+## How To:
 
-"Daemonize" is a script that create a "init.d" script and encapsulate or class enabling you to run it in the bash, for example.
+- [Call a PHP method from command line](docs/script.md)
+- [Install a PHP class/method call as a daemon](docs/install.md)
+- [Call a GET RESt endpoint from command line](docs/endpoint.md)
+- [Show the method documentation](docs/showdocs.md)
+- [Environment variables](docs/environment.md)
+- [Play with the service](docs/play.md)
 
-## How to
 
-Suppose you have a pre-existing class for read some info from database and run some action with these data. For example:
+## Install
 
-```php
-<?php
-namespace Some\Name\Space;
+Daemonize does not need to be associated to your PHP project. 
 
-class MyExistingClass
-{
-	// ...
-
-    public function someExistingMethod()
-    {
-        // Your code
-    }
-
-	// ...
-}
-```
-
-If you want transform this class and method in a linux daemon (or "daemonize" it) you have to first create a bootstrap php file. 
-
-The most simple bootstrap is `vendor/autoload.php` but you can create a more complex bootstrap file if you need.
-
-Below is an example of a bootstrap file:
-
-```php
-require_once __DIR__ . "/vendor/autoload.php";
-
-// Your code here
-```
-
-Now, if you want to test it you can run the command:
+Install locally (preferable):
 
 ```bash
-daemonize run \
-    "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" \
-    --bootstrap "relative/path/to/bootstrap.php" \
-    --rootdir "/path/to/root" \
-    --http-get "param1=value1&param2=value2"
+composer require "byjg/php-daemonize"
 ```
 
-You can test with:
-
-```bash
-daemonize run \
-    "\\ByJG\\Daemon\\Sample\\TryMe::ping"
-    --arg value1
-    --arg value2
-```
-
-If everything is ok, now you can "daemonize" this class (as root):
-
-```php
-daemonize install --template=systemd mydaemon \
-    --class "\\Some\\Name\\Space\\MyExistingClass::someExistingMethod" \
-    --bootstrap "relative/path/to/bootstrap.php" \
-    --rootdir "/path/to/root"
-```
-
-*note*: valid templates are:
-
-- systemd (default)
-- upstart
-- initd
-- crond
-
-Now for start or stop the service you need only
-
-```bash
-sudo service mydaemon start  # or stop, status or restart
-```
-
-For uninstall just type:
-
-```bash
-daemonize uninstall mydamon
-```
-
-and list all "daemonized" php classes
-
-```php
-daemonize services --only-names
-```
-
-# Install
-
-Daemonize does not need to be associated to your PHP project. You can either as a global package or as a local package.
+Install as a global composer package:
 
 ```bash
 composer global require "byjg/php-daemonize"
 sudo ln -s /root/.composer/vendor/bin/daemonize /usr/local/bin/daemonize
+
+# If you want to share this installation with another users consider use the command `chmod a+x /root`. 
+# The root directory will remain unreadable for them, but you'll can execute the script "daemonize".
 ```
-
-If you want to share this installation with another users consider use the command `chmod a+x /root`. The root
-directory will remain unreadable for them, but you'll can execute the script "daemonize".
-
-## Running a pre-installed demo
-
-Open two terminals.
-
-First do :
-
-```bash
-touch /etc/tryme.txt
-tail -f /etc/tryme.txt
-```
-
-On the second do:
-
-```php
-sudo daemonize install --template=upstart tryme "\\ByJG\\Daemon\\Sample\\TryMe::process" "vendor/autoload.php" "./"
-
-sudo service tryme start
-```
-
-If everything is OK, will see on the first terminal a lot of lines added. Do not forget to run `sudo service tryme stop`
-
-## Environment Variables
-
-| Variable               | Description                                                                                    |
-|------------------------|------------------------------------------------------------------------------------------------|
-| DAEMONIZE_MEMORY_LIMIT | If set will define the `memory_limit` for the daemonize process, otherwise won't have a limit. |
 
 ## Dependencies
 
