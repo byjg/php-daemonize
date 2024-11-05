@@ -24,6 +24,7 @@ class CallerTest extends TestCase
 
     public function testCli()
     {
+        /** @psalm-suppress ForbiddenCode */
         shell_exec( __DIR__ . '/../scripts/daemonize call /testclosure --http-get arg=10 --controller ' . __DIR__ . '/rest/app.php');
 
         $this->assertTrue(file_exists('/tmp/tryme_test.txt'));
@@ -32,6 +33,7 @@ class CallerTest extends TestCase
 
     public function testCliNoArgs()
     {
+        /** @psalm-suppress ForbiddenCode */
         shell_exec( __DIR__ . '/../scripts/daemonize call /testclosure --controller ' . __DIR__ . '/rest/app.php');
 
         $this->assertTrue(file_exists('/tmp/tryme_test.txt'));
