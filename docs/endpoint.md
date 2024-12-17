@@ -1,6 +1,6 @@
 # Call a GET RESt endpoint from command line
 
-Calling an endpoint from command line is very simple.
+Calling an endpoint from command line without actualy doing a HTTP Request is very simple.
 
 Your endpoint must be implemented using any PHP framework that handles the HTTP request and response.
 
