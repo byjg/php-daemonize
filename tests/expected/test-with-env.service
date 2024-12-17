@@ -5,7 +5,7 @@ Description=Custom Description
 [Service]
 Type=simple
 EnvironmentFile=/etc/daemonize/test.env
-ExecStart=PHP_BINARY CURDIR/scripts/daemonize run "ByJG\\Daemon\\Sample\\TryMe::saveJson" --bootstrap "vendor/autoload.php" --rootdir "CURDIR" --http-get a=1 --http-get b=2 --daemon
+ExecStart=PHP_BINARY CURDIR/scripts/daemonize run "ByJG\\Daemon\\Sample\\TryMe::ping" --bootstrap "vendor/autoload.php" --rootdir "CURDIR" --args 1 --args 2 --daemon
 Nice=5
 
 [Install]

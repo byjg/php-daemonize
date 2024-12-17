@@ -73,7 +73,7 @@ class Daemonize
 
         $consoleArgsPrepared = '';
         if (!empty($consoleArgs)) {
-            $consoleArgsPrepared = '--http-get ' . http_build_query($consoleArgs, '', ' --http-get ');
+            $consoleArgsPrepared = '--args ' . implode(' --args ', $consoleArgs);
         }
 
         $environmentPrepared = '/etc/daemonize/' . $svcName . '.env';

@@ -36,13 +36,6 @@ class RunCommand extends Command
                 getcwd()
             )
             ->addOption(
-                '--http-get',
-                "-g",
-                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
-                'is an optional arguments for your class',
-                []
-            )
-            ->addOption(
                 '--arg',
                 "a",
                 InputOption::VALUE_IS_ARRAY | InputOption::VALUE_OPTIONAL,
@@ -54,7 +47,14 @@ class RunCommand extends Command
                 'd',
                 InputOption::VALUE_NONE,
                 'Run as a daemon'
+            )
+            ->addOption(
+                'showdocs',
+                's',
+                InputOption::VALUE_NONE,
+                'Show docs and exit'
             );
+
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -74,9 +74,13 @@ class RunCommand extends Command
         chdir($rootPath);
         require_once $bootstrap;
 
-        parse_str(implode('&', $input->getOption('http-get')), $httpGet);
-        $runner = new Runner($className, $input->getOption("arg"), $httpGet, $input->getOption('daemon'));
-        $runner->execute();
+        $runner = new Runner($className, $input->getOption("arg"), $input->getOption('daemon'));
+
+        if ($input->getOption('showdocs')) {
+            $runner->showDocs();
+        } else {
+            $runner->execute();
+        }
 
         return 0;
     }

@@ -57,7 +57,7 @@ class DaemonizeTest extends TestCase
     public function testInstallMock()
     {
         Daemonize::setWriter($this->serviceWriter);
-        $result = Daemonize::install('test', 'ByJG\Daemon\Sample\TryMe::saveJson', 'vendor/autoload.php', __DIR__ . '/../', "systemd", 'Custom Description', [], []);
+        $result = Daemonize::install('test', 'ByJG\Daemon\Sample\TryMe::ping', 'vendor/autoload.php', __DIR__ . '/../', "systemd", 'Custom Description', [], []);
         $this->assertTrue($result);
         $this->assertEquals($this->read(__DIR__ . '/expected/test.env'), $this->read('/tmp/test.env'));
         $this->assertEquals($this->read(__DIR__ . '/expected/test.service'), $this->read('/tmp/test.service'));
@@ -66,7 +66,7 @@ class DaemonizeTest extends TestCase
     public function testInstallMockWithEnv()
     {
         Daemonize::setWriter($this->serviceWriter);
-        $result = Daemonize::install('test', 'ByJG\Daemon\Sample\TryMe::saveJson', 'vendor/autoload.php', __DIR__ . '/../', "systemd", 'Custom Description', ["a" => "1", "b" => 2], ['APP_ENV' => 'test', 'TEST' => 'true']);
+        $result = Daemonize::install('test', 'ByJG\Daemon\Sample\TryMe::ping', 'vendor/autoload.php', __DIR__ . '/../', "systemd", 'Custom Description', ["a" => "1", "b" => 2], ['APP_ENV' => 'test', 'TEST' => 'true']);
         $this->assertTrue($result);
         $this->assertEquals($this->read(__DIR__ . '/expected/test-with-env.env'), $this->read('/tmp/test.env'));
         $this->assertEquals($this->read(__DIR__ . '/expected/test-with-env.service'), $this->read('/tmp/test.service'));
@@ -90,13 +90,13 @@ class DaemonizeTest extends TestCase
         $command = __DIR__ . "/../scripts/daemonize install " .
             "--template systemd " . 
             "--description 'Custom Description' " .
-            "--class 'ByJG\Daemon\Sample\TryMe::saveJson' " .
+            "--class 'ByJG\Daemon\Sample\TryMe::ping' " .
             "--bootstrap 'vendor/autoload.php' " .
             "--rootdir '" . __DIR__ . "/../' " .
             "--env 'APP_ENV=test' " .
             "--env 'TEST=true' " .
-            "--http-get 'a=1' " .
-            "--http-get 'b=2' " .
+            "--args '1' " .
+            "--args '2' " .
             "test";
 
         /** @psalm-suppress ForbiddenCode */
@@ -130,7 +130,7 @@ class DaemonizeTest extends TestCase
             $this->markTestSkipped('This test will fail if you don\'t have systemd');
         };
 
-        Daemonize::install('test', 'ByJG\Daemon\Sample\TryMe::saveJson', 'vendor/autoload.php', __DIR__ . '/../', "systemd", 'Custom Description', ["a" => "1", "b" => 2], ['APP_ENV' => 'test', 'TEST' => 'true']);
+        Daemonize::install('test', 'ByJG\Daemon\Sample\TryMe::ping', 'vendor/autoload.php', __DIR__ . '/../', "systemd", 'Custom Description', ["1", 2], ['APP_ENV' => 'test', 'TEST' => 'true']);
 
         $this->assertEquals($this->read(__DIR__ . '/expected/test-with-env.env'), $this->read('/etc/daemonize/test.env'));
         $this->assertEquals($this->read(__DIR__ . '/expected/test-with-env.service'), $this->read('/etc/systemd/system/test.service'));
